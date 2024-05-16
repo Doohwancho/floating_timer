@@ -11,6 +11,7 @@ struct minimal_timerApp: App {
                 .frame(width: 250, height: 100)
                 .edgesIgnoringSafeArea(.all) // Optional: to make the content edge-to-edge
         }
-        .windowStyle(HiddenTitleBarWindowStyle()) // Hides the title bar
+        .windowStyle(HiddenTitleBarWindowStyle()) // Hides the title(navigation) bar
+        .windowToolbarStyle(UnifiedCompactWindowToolbarStyle())
     }
 }

@@ -1,4 +1,5 @@
 import Cocoa
+import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
@@ -8,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.styleMask.remove(.closable)
             window.styleMask.remove(.miniaturizable)
             window.styleMask.remove(.resizable)
+            window.level = .floating
         }
     }
 }
