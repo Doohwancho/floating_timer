@@ -1,16 +1,24 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var timeRemaining = 300
-    @State private var timer: Timer?
-    @State private var isRunning = false
+    @ObservedObject var timerModel: TimerModel
+
+    // @State private var timeRemaining = 300
+    // @State private var timer: Timer?
+    // @State private var isRunning = false
 
     @State private var selectedIndex: Int?
-    
-    let totalTime = 300
+
+    // let totalTime = 300
+
+    // @ObservedObject var timerModel = TimerModel()
+    // timerModel.startTimer()
+    // timerModel.stopTimer()
     
     var body: some View {
         VStack {
+            // MinimalTimerView(timeRemaining: $timeRemaining)
+
             HStack {
                 ZStack {
                     HStack(spacing: 1) {
@@ -29,7 +37,7 @@ struct ContentView: View {
 
             HStack {
                 Button(action: {
-                    stopTimer()
+                    timerModel.stopTimer()
                 }) {
                     Text("5m")
                 }
@@ -39,7 +47,7 @@ struct ContentView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    stopTimer()
+                    timerModel.stopTimer()
                 }) {
                     Text("10m")
                 }
@@ -47,7 +55,7 @@ struct ContentView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    stopTimer()
+                    timerModel.stopTimer()
                 }) {
                     Text("25m")
                 }
@@ -63,13 +71,13 @@ struct ContentView: View {
 
             HStack {
                 Button(action: {
-                    if isRunning {
-                        pauseTimer()
+                    if timerModel.isRunning {
+                        timerModel.pauseTimer()
                     } else {
-                        startTimer()
+                        timerModel.startTimer()
                     }
                 }) {
-                    Text(isRunning ? "pause" : "start")
+                    Text(timerModel.isRunning ? "pause" : "start")
                     .padding(.trailing)
                 }
                 .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
@@ -78,7 +86,7 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                Text(formatTime(timeRemaining))
+                Text(formatTime(timerModel.timeRemaining))
                     .font(.system(size: 32)) // Reduce the font size
                     .padding(.trailing)
             }
@@ -86,29 +94,29 @@ struct ContentView: View {
         .frame(width: 250, height: 100) // Adjust the width and height to make the screen smaller
     }
     
-    func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-            } else {
-                stopTimer()
-            }
-        }
-        isRunning = true
-    }
+    // func startTimer() {
+    //     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+    //         if timeRemaining > 0 {
+    //             timeRemaining -= 1
+    //         } else {
+    //             stopTimer()
+    //         }
+    //     }
+    //     isRunning = true
+    // }
     
-    func pauseTimer() {
-        timer?.invalidate()
-        timer = nil
-        isRunning = false
-    }
+    // func pauseTimer() {
+    //     timer?.invalidate()
+    //     timer = nil
+    //     isRunning = false
+    // }
     
-    func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        timeRemaining = totalTime
-        isRunning = false
-    }
+    // func stopTimer() {
+    //     timer?.invalidate()
+    //     timer = nil
+    //     timeRemaining = totalTime
+    //     isRunning = false
+    // }
     
     func formatTime(_ seconds: Int) -> String {
         let minutes = seconds / 60
@@ -117,6 +125,7 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+// #Preview {
+    // @ObservedObject var timerModel: TimerModel
+    // ContentView(timerModel: timerModel)
+// }
