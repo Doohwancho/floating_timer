@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F832263B2BF627A300656577 /* MinimalTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F832263A2BF627A300656577 /* MinimalTimerView.swift */; };
 		F8AEFC862BF7131F00E193DF /* TransparentDraggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC852BF7131F00E193DF /* TransparentDraggable.swift */; };
 		F8D9E2ED2BF5C1EA001BF39A /* minimal_timerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */; };
 		F8D9E2EF2BF5C1EA001BF39A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E2EE2BF5C1EA001BF39A /* ContentView.swift */; };
@@ -40,7 +39,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F832263A2BF627A300656577 /* MinimalTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTimerView.swift; sourceTree = "<group>"; };
 		F8AEFC852BF7131F00E193DF /* TransparentDraggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentDraggable.swift; sourceTree = "<group>"; };
 		F8D9E2E92BF5C1EA001BF39A /* minimal_timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = minimal_timer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = minimal_timerApp.swift; sourceTree = "<group>"; };
@@ -174,7 +172,6 @@
 			children = (
 				F8D9E2EE2BF5C1EA001BF39A /* ContentView.swift */,
 				F8D9E3212BF62383001BF39A /* FloatingTimerView.swift */,
-				F832263A2BF627A300656577 /* MinimalTimerView.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -313,7 +310,6 @@
 				F8D9E31A2BF616FC001BF39A /* AppDelegate.swift in Sources */,
 				F8D9E2EF2BF5C1EA001BF39A /* ContentView.swift in Sources */,
 				F8D9E3222BF62383001BF39A /* FloatingTimerView.swift in Sources */,
-				F832263B2BF627A300656577 /* MinimalTimerView.swift in Sources */,
 				F8D9E31F2BF62298001BF39A /* TimerModel.swift in Sources */,
 				F8D9E2ED2BF5C1EA001BF39A /* minimal_timerApp.swift in Sources */,
 				F8D9E3182BF616DF001BF39A /* NSWindow.swift in Sources */,

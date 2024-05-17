@@ -30,6 +30,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         firstUIWindow?.contentView?.layer?.cornerRadius = 10 // Set the desired corner radius
         firstUIWindow?.contentView?.layer?.masksToBounds = true
 
+        firstUIWindow?.level = .floating
+
 
         let secondContentView = FloatingTimerView(timerModel: timerModel)
         secondUIWindow = NSWindow( //?
@@ -41,21 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         secondUIWindow?.contentView = NSHostingController(rootView: secondContentView).view
         secondUIWindow?.makeKeyAndOrderFront(nil)
 
-        // secondUIWindow?.isOpaque = false
-        // secondUIWindow?.backgroundColor = NSColor.clear
-        // secondUIWindow?.contentView?.wantsLayer = true
-        // secondUIWindow?.contentView?.layer?.cornerRadius = 10 // Set the desired corner radius
-        // secondUIWindow?.contentView?.layer?.masksToBounds = true
-
-        // let secondContentView = FloatingTimerView(timerModel: timerModel) // Assume you have another view called SecondContentView
-        // secondUIWindow = NSWindow(
-        //     contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
-        //     styleMask: [.titled, .closable, .miniaturizable, .resizable],
-        //     backing: .buffered, defer: false)
-        // secondUIWindow?.center()
-        // secondUIWindow?.setFrameAutosaveName("Second UI")
-        // secondUIWindow?.contentView = NSHostingController(rootView: secondContentView).view
-        // secondUIWindow?.orderOut(nil)
+        secondUIWindow?.level = .floating
     }
 
     func setupShortcut() {
