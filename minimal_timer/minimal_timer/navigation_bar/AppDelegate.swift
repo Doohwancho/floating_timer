@@ -13,7 +13,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func setupWindows() {
         let timerModel = TimerModel() // Create an instance of TimerModel
 
-        let firstContentView = ContentView(timerModel: timerModel)
+        let firstContentView = ContentView(
+            timerModel: timerModel)
         firstUIWindow = TransparentDraggableWindow(
             contentRect: NSRect(x: 0, y: 0, width: 250, height: 100),
             styleMask: [.closable, .miniaturizable, .resizable, .fullSizeContentView], // Adjusted styleMask
