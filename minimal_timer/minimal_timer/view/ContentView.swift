@@ -4,6 +4,7 @@ struct ContentView: View {
     @ObservedObject var timerModel: TimerModel
     @State private var isFirstUIVisible = true
     @State private var firstUIWindow: NSWindow?
+    @State private var accumulatedNumber: String = ""
 
     var body: some View {
         Group {
@@ -111,15 +112,35 @@ struct ContentView: View {
                 }
                 return event
             }
+            
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.modifierFlags.contains(.command) {
+                    return event
+                }
+                    if let characters = event.characters {
+                        for character in characters {
+                        if character.isNumber {
+                            self.accumulatedNumber.append(character)
+                            self.finalizeInput()
+                            return nil
+                        }
+                    }
+                }
+                return event
+            }
+        }
+    }
+
+    private func finalizeInput() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let finalNumber = Int(self.accumulatedNumber) {
+                self.timerModel.timeRemaining = finalNumber * 60 // Convert minutes to seconds
+            }
+            self.accumulatedNumber = "" // Reset for next input
         }
     }
 }
 
-
-
-
-
 // #Preview {
-    // @ObservedObject var timerModel: TimerModel
-    // ContentView(timerModel: timerModel)
+    // ContentView()
 // }
