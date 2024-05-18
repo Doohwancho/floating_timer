@@ -12,6 +12,8 @@ struct ContentView: View {
                 FirstTimerView(timerModel: self.timerModel)
                     // .fixedSize()
                 .onAppear {
+                    //TODO: delete navigation bar
+                    //TODO: make timer ui draggable
                     let window1 = NSApplication.shared.windows.first
                     window1?.titleVisibility = .hidden
                     window1?.titlebarAppearsTransparent = true
@@ -35,6 +37,8 @@ struct ContentView: View {
                 SecondTimerView(timerModel: timerModel)
                 .fixedSize()
                 .onAppear {
+                    //TODO: delete navigation bar
+                    //TODO: make timer ui draggable
                     let window2 = NSApplication.shared.windows.first
                     window2?.titleVisibility = .hidden
                     window2?.titlebarAppearsTransparent = true
@@ -59,7 +63,7 @@ struct ContentView: View {
         .onAppear {
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 if event.keyCode == 53 {  //esc = 53 of keyCode
-                    isFirstUIVisible.toggle() //TODO: when toggle, delete switching sound
+                    isFirstUIVisible.toggle() 
                     // withAnimation {
                     //     isFirstUIVisible.toggle()
                     // }
@@ -88,21 +92,18 @@ struct ContentView: View {
                             self.timerModel.stopTimer()
                         }
                         self.timerModel.setTimer(with: 5)
-                        // self.timerModel.startTimer()
                         return nil
                     case 19: // keyCode for 2
                         if(self.timerModel.isRunning) {
                             self.timerModel.stopTimer()
                         }
                         self.timerModel.setTimer(with: 10)
-                        // self.timerModel.startTimer()
                         return nil
                     case 20: // keyCode for 3
                         if(self.timerModel.isRunning) {
                             self.timerModel.stopTimer()
                         }
                         self.timerModel.setTimer(with: 25)
-                        // self.timerModel.startTimer()
                         return nil
                     default:
                         break

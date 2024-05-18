@@ -2,7 +2,6 @@ import Foundation
 
 class TimerModel: ObservableObject { 
     @Published var isRunning = false
-    // @Published var timeRemaining: Int = 300
     private var _timeRemaining: Int = 300
     var timeRemaining: Int {
         get { _timeRemaining }

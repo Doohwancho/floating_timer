@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F8AEFC862BF7131F00E193DF /* TransparentDraggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC852BF7131F00E193DF /* TransparentDraggable.swift */; };
 		F8AEFC882BF76C4F00E193DF /* FirstTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC872BF76C4F00E193DF /* FirstTimerView.swift */; };
 		F8AEFC8A2BF76C6400E193DF /* SecondTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC892BF76C6400E193DF /* SecondTimerView.swift */; };
 		F8D9E2ED2BF5C1EA001BF39A /* minimal_timerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */; };
@@ -17,7 +16,6 @@
 		F8D9E2FF2BF5C1EB001BF39A /* minimal_timerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E2FE2BF5C1EB001BF39A /* minimal_timerTests.swift */; };
 		F8D9E3092BF5C1EB001BF39A /* minimal_timerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E3082BF5C1EB001BF39A /* minimal_timerUITests.swift */; };
 		F8D9E30B2BF5C1EB001BF39A /* minimal_timerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E30A2BF5C1EB001BF39A /* minimal_timerUITestsLaunchTests.swift */; };
-		F8D9E3182BF616DF001BF39A /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E3172BF616DF001BF39A /* NSWindow.swift */; };
 		F8D9E31F2BF62298001BF39A /* TimerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E31E2BF62298001BF39A /* TimerModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +37,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F8AEFC852BF7131F00E193DF /* TransparentDraggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentDraggable.swift; sourceTree = "<group>"; };
 		F8AEFC872BF76C4F00E193DF /* FirstTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstTimerView.swift; sourceTree = "<group>"; };
 		F8AEFC892BF76C6400E193DF /* SecondTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondTimerView.swift; sourceTree = "<group>"; };
 		F8D9E2E92BF5C1EA001BF39A /* minimal_timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = minimal_timer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,7 +50,6 @@
 		F8D9E3042BF5C1EB001BF39A /* minimal_timerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = minimal_timerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8D9E3082BF5C1EB001BF39A /* minimal_timerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = minimal_timerUITests.swift; sourceTree = "<group>"; };
 		F8D9E30A2BF5C1EB001BF39A /* minimal_timerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = minimal_timerUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		F8D9E3172BF616DF001BF39A /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		F8D9E31E2BF62298001BF39A /* TimerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -93,8 +89,6 @@
 		F8AEFC842BF7130300E193DF /* windows */ = {
 			isa = PBXGroup;
 			children = (
-				F8D9E3172BF616DF001BF39A /* NSWindow.swift */,
-				F8AEFC852BF7131F00E193DF /* TransparentDraggable.swift */,
 			);
 			path = windows;
 			sourceTree = "<group>";
@@ -298,13 +292,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8AEFC862BF7131F00E193DF /* TransparentDraggable.swift in Sources */,
 				F8D9E2EF2BF5C1EA001BF39A /* ContentView.swift in Sources */,
 				F8AEFC882BF76C4F00E193DF /* FirstTimerView.swift in Sources */,
 				F8D9E31F2BF62298001BF39A /* TimerModel.swift in Sources */,
 				F8AEFC8A2BF76C6400E193DF /* SecondTimerView.swift in Sources */,
 				F8D9E2ED2BF5C1EA001BF39A /* minimal_timerApp.swift in Sources */,
-				F8D9E3182BF616DF001BF39A /* NSWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

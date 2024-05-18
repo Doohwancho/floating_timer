@@ -2,11 +2,10 @@ import Foundation
 import SwiftUI
 
 struct SecondTimerView: View {
-    // @ObservedObject var timerModel: TimerModel
     @ObservedObject var timerModel = TimerModel()
 
     var body: some View {
-        Text(formatTime(timerModel.timeRemaining))
+        Text(timerModel.formatTime(timerModel.timeRemaining))
             .font(.largeTitle)
             .frame(width: 100, height: 50)
             .background(Color.black)
@@ -20,10 +19,5 @@ struct SecondTimerView: View {
                     timerModel.startTimer()
                 }
             }
-    }
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, remainingSeconds)
     }
 }

@@ -2,23 +2,11 @@ import SwiftUI
 import Foundation
 
 struct FirstTimerView: View {
-
     @ObservedObject var timerModel = TimerModel()
-    // @State private var timeRemaining = 300
-    // @State private var timer: Timer?
-    // @State private var isRunning = false
     @State private var selectedIndex: Int?
 
-
-    // let totalTime = 300
-
-    // timerModel.startTimer()
-    // timerModel.stopTimer()
-    
     var body: some View {
         VStack {
-            // MinimalTimerView(timeRemaining: $timeRemaining)
-
             HStack {
                 ZStack {
                     HStack(spacing: 1) {
@@ -48,13 +36,10 @@ struct FirstTimerView: View {
                     Text("5m")
                 }
                 .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
-                // .buttonStyle(.borderless) // Makes the button borderless and background colorless
-                // .contentEdgeInsets(EdgeInsets(0, 0, 0, 0))
                 .padding(.leading)
                 
                 Button(action: {
                     timerModel.setTimer(with: 10)
-                    // timerModel.startTimer()
                 }) {
                     Text("10m")
                 }
@@ -63,7 +48,6 @@ struct FirstTimerView: View {
                 
                 Button(action: {
                     timerModel.setTimer(with: 25)
-                    // timerModel.startTimer()
                 }) {
                     Text("25m")
                 }
@@ -94,42 +78,11 @@ struct FirstTimerView: View {
                 
                 Spacer()
                 
-                Text(formatTime(timerModel.getTimeRemaining()))
-                    .font(.system(size: 32)) // Reduce the font size
+                Text(timerModel.formatTime(timerModel.getTimeRemaining()))
+                    .font(.system(size: 32)) 
                     .padding(.trailing)
             }
         }
-        .frame(width: 250, height: 100) // Adjust the width and height to make the screen smaller
+        .frame(width: 250, height: 100) 
     }
-    
-    // func startTimer() {
-    //     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-    //         if timeRemaining > 0 {
-    //             timeRemaining -= 1
-    //         } else {
-    //             stopTimer()
-    //         }
-    //     }
-    //     isRunning = true
-    // }
-    
-    // func pauseTimer() {
-    //     timer?.invalidate()
-    //     timer = nil
-    //     isRunning = false
-    // }
-    
-    // func stopTimer() {
-    //     timer?.invalidate()
-    //     timer = nil
-    //     timeRemaining = totalTime
-    //     isRunning = false
-    // }
-    
-    func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, remainingSeconds)
-    }
-
 }
