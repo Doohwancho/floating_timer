@@ -1,8 +1,9 @@
 import Foundation
 import SwiftUI
 
-struct FloatingTimerView: View {
-    @ObservedObject var timerModel: TimerModel
+struct SecondTimerView: View {
+    // @ObservedObject var timerModel: TimerModel
+    @ObservedObject var timerModel = TimerModel()
 
     var body: some View {
         Text(formatTime(timerModel.timeRemaining))

@@ -2,128 +2,78 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var timerModel: TimerModel
+    @State private var isFirstUIVisible = true
+    @State private var firstUIWindow: NSWindow?
 
-    // @State private var timeRemaining = 300
-    // @State private var timer: Timer?
-    // @State private var isRunning = false
-
-    @State private var selectedIndex: Int?
-
-    // let totalTime = 300
-
-    // @ObservedObject var timerModel = TimerModel()
-    // timerModel.startTimer()
-    // timerModel.stopTimer()
-    
     var body: some View {
-        VStack {
-            // MinimalTimerView(timeRemaining: $timeRemaining)
+        Group {
+            if isFirstUIVisible {
+                FirstTimerView(timerModel: self.timerModel)
+                    // .fixedSize()
+                .onAppear {
+                    let window1 = NSApplication.shared.windows.first
+                    window1?.titleVisibility = .hidden
+                    window1?.titlebarAppearsTransparent = true
+                    // window1?.styleMask.remove(.titled)
+                    window1?.styleMask.remove(.closable)
+                    window1?.styleMask.remove(.miniaturizable)
+                    window1?.styleMask.remove(.resizable) 
+                    window1?.styleMask.remove(.fullSizeContentView)
+                    window1?.isOpaque = false
+                    window1?.backgroundColor = NSColor.clear
+                    window1?.contentView?.wantsLayer = true
+                    window1?.contentView?.layer?.cornerRadius = 10
+                    window1?.contentView?.layer?.masksToBounds = true
+                    window1?.level = .floating
 
-            HStack {
-                ZStack {
-                    HStack(spacing: 1) {
-                        ForEach(0..<121) { index in
-                            Rectangle()
-                                .fill(selectedIndex == index ? Color.black : Color.gray)
-                                .frame(width: 1, height: 20)
-                                .onTapGesture {
-                                    selectedIndex = index
-                                }
-                        }
-                    }.frame(height:30)
+                    // Adjust the window size to fit the content
+                    // window1?.setContentSize(window1?.contentView?.fittingSize ?? .zero)
+                    window1?.setContentSize(NSSize(width: 250, height: 100))
                 }
-                .padding(.top, 0) 
-            }
+            } else {
+                SecondTimerView(timerModel: timerModel)
+                .fixedSize()
+                .onAppear {
+                    let window2 = NSApplication.shared.windows.first
+                    window2?.titleVisibility = .hidden
+                    window2?.titlebarAppearsTransparent = true
+                    // window2?.styleMask.remove(.titled)
+                    window2?.styleMask.remove(.closable)
+                    window2?.styleMask.remove(.miniaturizable)
+                    window2?.styleMask.remove(.resizable)
+                    window2?.styleMask.remove(.fullSizeContentView) 
+                    window2?.isOpaque = false
+                    window2?.backgroundColor = NSColor.clear
+                    window2?.contentView?.wantsLayer = true
+                    window2?.contentView?.layer?.cornerRadius = 10
+                    window2?.contentView?.layer?.masksToBounds = true
+                    window2?.level = .floating 
 
-            HStack {
-                Button(action: {
-                    timerModel.stopTimer()
-                }) {
-                    Text("5m")
+                    // Adjust the window size to fit the content
+                    // window2?.setContentSize(window2?.contentView?.fittingSize ?? .zero)
+                    window2?.setContentSize(NSSize(width: 100, height: 50))
                 }
-                .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
-                // .buttonStyle(.borderless) // Makes the button borderless and background colorless
-                // .contentEdgeInsets(EdgeInsets(0, 0, 0, 0))
-                .padding(.leading)
-                
-                Button(action: {
-                    timerModel.stopTimer()
-                }) {
-                    Text("10m")
-                }
-                .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
-                .padding(.leading)
-                
-                Button(action: {
-                    timerModel.stopTimer()
-                }) {
-                    Text("25m")
-                }
-                .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
-                .padding(.leading)
-                
-                Spacer()
-                
-                Text("...")
-                .padding(.trailing)
-            }
-            .padding(.bottom, 1)
-
-            HStack {
-                Button(action: {
-                    if timerModel.isRunning {
-                        timerModel.pauseTimer()
-                    } else {
-                        timerModel.startTimer()
-                    }
-                }) {
-                    Text(timerModel.isRunning ? "pause" : "start")
-                    .padding(.trailing)
-                }
-                .buttonStyle(PlainButtonStyle()) // Makes the button borderless and background colorless
-                .padding(0)
-                .padding(.leading)
-                
-                Spacer()
-                
-                Text(formatTime(timerModel.timeRemaining))
-                    .font(.system(size: 32)) // Reduce the font size
-                    .padding(.trailing)
             }
         }
-        .frame(width: 250, height: 100) // Adjust the width and height to make the screen smaller
-    }
-    
-    // func startTimer() {
-    //     timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-    //         if timeRemaining > 0 {
-    //             timeRemaining -= 1
-    //         } else {
-    //             stopTimer()
-    //         }
-    //     }
-    //     isRunning = true
-    // }
-    
-    // func pauseTimer() {
-    //     timer?.invalidate()
-    //     timer = nil
-    //     isRunning = false
-    // }
-    
-    // func stopTimer() {
-    //     timer?.invalidate()
-    //     timer = nil
-    //     timeRemaining = totalTime
-    //     isRunning = false
-    // }
-    
-    func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, remainingSeconds)
+        .onAppear {
+            //spacebar = 49
+            //esc = 53
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.keyCode == 53 { 
+                    isFirstUIVisible.toggle() //TODO: when toggle, delete switching sound
+                    // withAnimation {
+                    //     isFirstUIVisible.toggle()
+                    // }
+                }
+                return event
+            }
+        }
     }
 }
+
+
+
+
 
 // #Preview {
     // @ObservedObject var timerModel: TimerModel
