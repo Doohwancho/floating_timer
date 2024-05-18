@@ -57,10 +57,8 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            //spacebar = 49
-            //esc = 53
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.keyCode == 53 { 
+                if event.keyCode == 53 {  //esc = 53 of keyCode
                     isFirstUIVisible.toggle() //TODO: when toggle, delete switching sound
                     // withAnimation {
                     //     isFirstUIVisible.toggle()
@@ -71,7 +69,7 @@ struct ContentView: View {
             }
 
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.keyCode == 49 { // keyCode for spacebar
+                if event.keyCode == 49 { //spacebar = 49 of keyCode
                     if self.timerModel.isRunning {
                         self.timerModel.pauseTimer()
                     } else {
@@ -89,21 +87,21 @@ struct ContentView: View {
                         if(self.timerModel.isRunning) {
                             self.timerModel.stopTimer()
                         }
-                        self.timerModel.timeRemaining = 300 // 5 minutes
+                        self.timerModel.setTimer(with: 5)
                         // self.timerModel.startTimer()
                         return nil
                     case 19: // keyCode for 2
                         if(self.timerModel.isRunning) {
                             self.timerModel.stopTimer()
                         }
-                        self.timerModel.timeRemaining = 600 // 10 minutes
+                        self.timerModel.setTimer(with: 10)
                         // self.timerModel.startTimer()
                         return nil
                     case 20: // keyCode for 3
                         if(self.timerModel.isRunning) {
                             self.timerModel.stopTimer()
                         }
-                        self.timerModel.timeRemaining = 1500 // 25 minutes
+                        self.timerModel.setTimer(with: 25)
                         // self.timerModel.startTimer()
                         return nil
                     default:
@@ -134,7 +132,7 @@ struct ContentView: View {
     private func finalizeInput() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let finalNumber = Int(self.accumulatedNumber) {
-                self.timerModel.timeRemaining = finalNumber * 60 // Convert minutes to seconds
+                self.timerModel.setTimer(with: finalNumber)
             }
             self.accumulatedNumber = "" // Reset for next input
         }

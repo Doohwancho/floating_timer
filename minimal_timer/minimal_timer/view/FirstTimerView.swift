@@ -24,7 +24,7 @@ struct FirstTimerView: View {
                     HStack(spacing: 1) {
                         ForEach(0..<121) { index in
                             Rectangle()
-                                .fill(selectedIndex == index ? Color.black : Color.gray)
+                                .fill(selectedIndex == index ? Color.black : Color(white: 0.95))
                                 .frame(width: 1, height: 20)
                                 .onTapGesture {
                                     selectedIndex = index
@@ -37,7 +37,7 @@ struct FirstTimerView: View {
 
             HStack {
                 Button(action: {
-                    timerModel.timeRemaining = 300
+                    timerModel.setTimer(with: 5)
                     // timerModel.startTimer()
                 }) {
                     Text("5m")
@@ -48,7 +48,7 @@ struct FirstTimerView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    timerModel.timeRemaining = 600
+                    timerModel.setTimer(with: 10)
                     // timerModel.startTimer()
                 }) {
                     Text("10m")
@@ -57,7 +57,7 @@ struct FirstTimerView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    timerModel.timeRemaining = 1500
+                    timerModel.setTimer(with: 25)
                     // timerModel.startTimer()
                 }) {
                     Text("25m")
@@ -89,7 +89,7 @@ struct FirstTimerView: View {
                 
                 Spacer()
                 
-                Text(formatTime(timerModel.timeRemaining))
+                Text(formatTime(timerModel.getTimeRemaining()))
                     .font(.system(size: 32)) // Reduce the font size
                     .padding(.trailing)
             }

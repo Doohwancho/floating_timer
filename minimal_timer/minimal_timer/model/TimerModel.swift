@@ -1,8 +1,16 @@
 import Foundation
 
 class TimerModel: ObservableObject { 
-    @Published var timeRemaining: Int = 300
     @Published var isRunning = false
+    // @Published var timeRemaining: Int = 300
+    private var _timeRemaining: Int = 300
+    var timeRemaining: Int {
+        get { _timeRemaining }
+        set {
+            objectWillChange.send()
+            _timeRemaining = newValue
+        }
+    }
     var timer: Timer?
 
     func startTimer() {
@@ -26,6 +34,14 @@ class TimerModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         isRunning = false
+    }
+
+    func setTimer(with minutes: Int) {
+        timeRemaining = minutes * 60
+    }
+
+    func getTimeRemaining() -> Int {
+        return timeRemaining
     }
 
     func formatTime(_ seconds: Int) -> String {
