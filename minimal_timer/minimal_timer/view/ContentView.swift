@@ -67,6 +67,17 @@ struct ContentView: View {
                 }
                 return event
             }
+
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            if event.keyCode == 49 { // keyCode for spacebar
+                if self.timerModel.isRunning {
+                    self.timerModel.pauseTimer()
+                } else {
+                    self.timerModel.startTimer()
+                }
+            }
+            return event
+        }
         }
     }
 }
