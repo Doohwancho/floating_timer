@@ -30,7 +30,12 @@ struct FirstTimerView: View {
                                     selectedIndex = index
                                 }
                         }
-                    }.frame(height:30)
+                    }
+                    .onChange(of: timerModel.timeRemaining) {  //TODO: esc로 ui 바꾼 후, 1초간 렌더링 안되는 문제가 있다. 
+                        newTimeRemaining in
+                        selectedIndex = newTimeRemaining / 60 // Assuming timeRemaining is in seconds and you want to convert it to minutes
+                    }
+                    .frame(height:30)
                 }
                 .padding(.top, 0) 
             }
