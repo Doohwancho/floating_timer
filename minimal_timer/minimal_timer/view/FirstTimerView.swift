@@ -37,7 +37,8 @@ struct FirstTimerView: View {
 
             HStack {
                 Button(action: {
-                    timerModel.stopTimer()
+                    timerModel.timeRemaining = 300
+                    // timerModel.startTimer()
                 }) {
                     Text("5m")
                 }
@@ -47,7 +48,8 @@ struct FirstTimerView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    timerModel.stopTimer()
+                    timerModel.timeRemaining = 600
+                    // timerModel.startTimer()
                 }) {
                     Text("10m")
                 }
@@ -55,7 +57,8 @@ struct FirstTimerView: View {
                 .padding(.leading)
                 
                 Button(action: {
-                    timerModel.stopTimer()
+                    timerModel.timeRemaining = 1500
+                    // timerModel.startTimer()
                 }) {
                     Text("25m")
                 }

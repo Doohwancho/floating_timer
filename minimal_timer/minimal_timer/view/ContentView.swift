@@ -69,15 +69,43 @@ struct ContentView: View {
             }
 
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.keyCode == 49 { // keyCode for spacebar
-                if self.timerModel.isRunning {
-                    self.timerModel.pauseTimer()
-                } else {
-                    self.timerModel.startTimer()
+                if event.keyCode == 49 { // keyCode for spacebar
+                    if self.timerModel.isRunning {
+                        self.timerModel.pauseTimer()
+                    } else {
+                        self.timerModel.startTimer()
+                    }
                 }
+                return event
             }
-            return event
-        }
+
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            if event.modifierFlags.contains(.command) {
+                switch event.keyCode {
+                    case 18: // keyCode for 1
+                        if(self.timerModel.isRunning) {
+                            self.timerModel.stopTimer()
+                        }
+                        self.timerModel.timeRemaining = 300 // 5 minutes
+                        // self.timerModel.startTimer()
+                    case 19: // keyCode for 2
+                        if(self.timerModel.isRunning) {
+                            self.timerModel.stopTimer()
+                        }
+                        self.timerModel.timeRemaining = 600 // 10 minutes
+                        // self.timerModel.startTimer()
+                    case 20: // keyCode for 3
+                        if(self.timerModel.isRunning) {
+                            self.timerModel.stopTimer()
+                        }
+                        self.timerModel.timeRemaining = 1500 // 25 minutes
+                        // self.timerModel.startTimer()
+                    default:
+                        break
+                    }
+                }
+                return event
+            }
         }
     }
 }
