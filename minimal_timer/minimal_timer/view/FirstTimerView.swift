@@ -4,7 +4,6 @@ import Foundation
 
 struct FirstTimerView: View {
     @ObservedObject var timerModel = TimerModel()
-    @State private var selectedIndex: Int?
 
     var body: some View {
         VStack {
@@ -13,18 +12,13 @@ struct FirstTimerView: View {
                     HStack(spacing: 1) {
                         ForEach(0..<121) { index in
                             Rectangle()
-                                .fill(selectedIndex == index ? Color.black : Color(white: 0.95))
+                                .fill(timerModel.getTimeIndexInMinutes() == index ? Color.black : Color(white: 0.95))
                                 .frame(width: 1, height: 20)
                                 .onTapGesture {
-                                    selectedIndex = index
+                                    timerModel.setTimer(with: index) 
                                 }
                         }
                     }
-                    .onChange(of: timerModel.timeRemaining) {  //TODO: esc로 ui 바꾼 후, 1초간 렌더링 안되는 문제가 있다. 
-                        newTimeRemaining in
-                        let minutes = newTimeRemaining / 60
-                        selectedIndex = min(minutes, 120) // Cap the selectedIndex at 120
-                    }//TODO: clicking vertical bar should set timer
                     .frame(height:30)
                 }
                 .padding(.top, 0) 

@@ -10,7 +10,7 @@ struct ContentView: View {
         Group {
             if isFirstUIVisible {
                 FirstTimerView(timerModel: self.timerModel)
-                // .fixedSize()
+                .fixedSize()
                 .onAppear {
                     let window1 = NSApplication.shared.windows.first
                     window1?.titleVisibility = .hidden

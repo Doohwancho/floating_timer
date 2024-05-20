@@ -10,6 +10,14 @@ class TimerModel: ObservableObject {
             _timeRemaining = newValue
         }
     }
+    private var _timeIndexInMinutes: Int = 5
+    var timeIndexInMinutes: Int {
+        get { _timeIndexInMinutes }
+        set {
+            objectWillChange.send()
+            _timeIndexInMinutes = newValue
+        }
+    }
     var timer: Timer?
 
     func startTimer() {
@@ -37,10 +45,19 @@ class TimerModel: ObservableObject {
 
     func setTimer(with minutes: Int) {
         timeRemaining = minutes * 60
+        updateSelectedIndex(with: minutes)
     }
 
     func getTimeRemaining() -> Int {
         return timeRemaining
+    }
+
+    func updateSelectedIndex(with minutes: Int) {
+        timeIndexInMinutes = min(minutes, 120) // Cap the selectedIndex at 120
+    }
+
+    func getTimeIndexInMinutes() -> Int {
+        return timeIndexInMinutes
     }
 
     func formatTime(_ seconds: Int) -> String {
