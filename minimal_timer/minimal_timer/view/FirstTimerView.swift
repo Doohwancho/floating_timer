@@ -15,7 +15,7 @@ struct FirstTimerView: View {
                                 .fill(timerModel.getTimeIndexInMinutes() == index ? Color.black : Color(white: 0.95))
                                 .frame(width: 1, height: 20)
                                 .onTapGesture {
-                                    timerModel.setTimer(with: index) 
+                                    timerModel.setTimer(with: index) //TODO: vertical bar 사이 공간 클릭하면 인식 못하는 문제 해결 필요 
                                 }
                         }
                     }

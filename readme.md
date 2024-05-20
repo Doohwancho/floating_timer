@@ -1,8 +1,6 @@
-
 # A. what
 
-![](images/2024-05-18-17-42-18.png)
-![](images/2024-05-18-17-42-32.png)
+![](images/2024-05-20-19-41-12.png)
 
 Minimal Floating Timer
 
