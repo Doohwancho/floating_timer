@@ -15,10 +15,10 @@ Minimal Floating Timer
 # C. shortcut
 
 ```
-1. spacebar: 타이머 시작/중지
-2. command + 1: 5m
-3. command + 2: 10m
-4. command + 3: 25m
-5. esc: switch to transparent mode
-6. 숫자키: 시간 설정(in minute, transparent mode only)
+1. esc: switch between transparent mode && minimal timer mode
+2. spacebar: 타이머 시작/중지
+3. command + 1: 5m
+4. command + 2: 10m
+5. command + 3: 25m
+6. 숫자키: 시간 설정(in minute)
 ```
