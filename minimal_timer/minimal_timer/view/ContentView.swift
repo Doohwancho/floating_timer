@@ -10,7 +10,7 @@ struct ContentView: View {
         Group {
             if isFirstUIVisible {
                 FirstTimerView(timerModel: self.timerModel)
-                    // .fixedSize()
+                // .fixedSize()
                 .onAppear {
                     let window1 = NSApplication.shared.windows.first
                     window1?.titleVisibility = .hidden
@@ -32,6 +32,15 @@ struct ContentView: View {
                     // Adjust the window size to fit the content
                     // window1?.setContentSize(window1?.contentView?.fittingSize ?? .zero)
                     window1?.setContentSize(NSSize(width: 250, height: 100))
+
+                    // Align window to the top right corner of the screen
+                    if let screen = window1?.screen {
+                        let screenWidth = screen.visibleFrame.width
+                        let screenHeight = screen.visibleFrame.height
+                        let newOriginX = screenWidth - 250 // window width
+                        let newOriginY = screenHeight - 100 // window height
+                        window1?.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
+                    }
                 }
             } else {
                 SecondTimerView(timerModel: timerModel)
@@ -57,6 +66,15 @@ struct ContentView: View {
                     // Adjust the window size to fit the content
                     // window2?.setContentSize(window2?.contentView?.fittingSize ?? .zero)
                     window2?.setContentSize(NSSize(width: 100, height: 50))
+
+                    // Align window to the right side of the screen
+                    if let screen = window2?.screen {
+                        let screenWidth = screen.visibleFrame.width
+                        let screenHeight = screen.visibleFrame.height
+                        let newOriginX = screenWidth - 100 // window width
+                        let newOriginY = screenHeight - 50 // vertically center
+                        window2?.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
+                    }
                 }
             }
         }
