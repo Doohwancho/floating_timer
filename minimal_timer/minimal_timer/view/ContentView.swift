@@ -157,10 +157,10 @@ struct ContentView: View {
     }
 
     private func finalizeInput() {
+        if let finalNumber = Int(self.accumulatedNumber) {
+            self.timerModel.setTimer(with: finalNumber)
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let finalNumber = Int(self.accumulatedNumber) {
-                self.timerModel.setTimer(with: finalNumber)
-            }
             self.accumulatedNumber = "" // Reset for next input
         }
     }

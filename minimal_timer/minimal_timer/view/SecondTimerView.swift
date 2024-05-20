@@ -11,7 +11,6 @@ struct SecondTimerView: View {
             .background(Color.black)
             .foregroundColor(.white)
             .clipShape(Rectangle())
-            // .clipShape(RoundedRectangle(cornerRadius: 20)) //TODO: rounded rectangle's edge is white and idk how to remove it
             .onTapGesture {
                 if timerModel.isRunning {
                     timerModel.stopTimer()
