@@ -86,13 +86,6 @@
 			path = model;
 			sourceTree = "<group>";
 		};
-		F8AEFC842BF7130300E193DF /* windows */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = windows;
-			sourceTree = "<group>";
-		};
 		F8D9E2E02BF5C1EA001BF39A = {
 			isa = PBXGroup;
 			children = (
@@ -116,7 +109,6 @@
 		F8D9E2EB2BF5C1EA001BF39A /* minimal_timer */ = {
 			isa = PBXGroup;
 			children = (
-				F8AEFC842BF7130300E193DF /* windows */,
 				F83226392BF626A000656577 /* model */,
 				F8D9E3202BF62366001BF39A /* view */,
 				F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */,

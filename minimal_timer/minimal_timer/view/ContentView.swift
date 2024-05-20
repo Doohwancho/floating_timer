@@ -12,16 +12,16 @@ struct ContentView: View {
                 FirstTimerView(timerModel: self.timerModel)
                     // .fixedSize()
                 .onAppear {
-                    //TODO: delete navigation bar
-                    //TODO: make timer ui draggable
                     let window1 = NSApplication.shared.windows.first
                     window1?.titleVisibility = .hidden
                     window1?.titlebarAppearsTransparent = true
-                    // window1?.styleMask.remove(.titled)
-                    window1?.styleMask.remove(.closable)
+                    window1?.styleMask.insert(.borderless) // Make window borderless to enable dragging
+                    window1?.isMovableByWindowBackground = true // Allow the window to be moved by dragging its background
+                    window1?.styleMask.remove(.titled)
+                    // window1?.styleMask.remove(.closable)
                     window1?.styleMask.remove(.miniaturizable)
                     window1?.styleMask.remove(.resizable) 
-                    window1?.styleMask.remove(.fullSizeContentView)
+                    // window1?.styleMask.remove(.fullSizeContentView)
                     window1?.isOpaque = false
                     window1?.backgroundColor = NSColor.clear
                     window1?.contentView?.wantsLayer = true
@@ -37,16 +37,16 @@ struct ContentView: View {
                 SecondTimerView(timerModel: timerModel)
                 .fixedSize()
                 .onAppear {
-                    //TODO: delete navigation bar
-                    //TODO: make timer ui draggable
                     let window2 = NSApplication.shared.windows.first
                     window2?.titleVisibility = .hidden
                     window2?.titlebarAppearsTransparent = true
-                    // window2?.styleMask.remove(.titled)
-                    window2?.styleMask.remove(.closable)
+                    window2?.styleMask.insert(.borderless) // Make window borderless to enable dragging
+                    window2?.isMovableByWindowBackground = true // Allow the window to be moved by dragging its background
+                    window2?.styleMask.remove(.titled)
+                    // window2?.styleMask.remove(.closable)
                     window2?.styleMask.remove(.miniaturizable)
                     window2?.styleMask.remove(.resizable)
-                    window2?.styleMask.remove(.fullSizeContentView) 
+                    // window2?.styleMask.remove(.fullSizeContentView) 
                     window2?.isOpaque = false
                     window2?.backgroundColor = NSColor.clear
                     window2?.contentView?.wantsLayer = true
