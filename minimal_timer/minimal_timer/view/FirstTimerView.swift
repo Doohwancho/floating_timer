@@ -22,7 +22,8 @@ struct FirstTimerView: View {
                     }
                     .onChange(of: timerModel.timeRemaining) {  //TODO: esc로 ui 바꾼 후, 1초간 렌더링 안되는 문제가 있다. 
                         newTimeRemaining in
-                        selectedIndex = newTimeRemaining / 60 // Assuming timeRemaining is in seconds and you want to convert it to minutes
+                        let minutes = newTimeRemaining / 60
+                        selectedIndex = min(minutes, 120) // Cap the selectedIndex at 120
                     }//TODO: clicking vertical bar should set timer
                     .frame(height:30)
                 }
