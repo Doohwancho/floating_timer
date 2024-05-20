@@ -145,6 +145,14 @@ struct ContentView: View {
                 }
                 return event
             }
+
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.modifierFlags.contains(.command) && event.keyCode == 13 { // keyCode for 'W' is 13
+                    NSApplication.shared.terminate(self)
+                    return nil
+                }
+                return event
+            }
         }
     }
 
