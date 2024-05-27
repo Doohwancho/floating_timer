@@ -95,7 +95,7 @@ struct ContentView: View {
                     if self.timerModel.isRunning {
                         self.timerModel.pauseTimer()
                     } else {
-                        self.timerModel.startTimer()
+                        self.timerModel.startTimerDecrease()
                     }
                     return nil
                 }
@@ -126,6 +126,18 @@ struct ContentView: View {
                     default:
                         break
                     }
+                }
+                return event
+            }
+
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.modifierFlags.contains(.command) && event.keyCode == 1 { // keyCode for 'S' is 1
+                    if self.timerModel.isRunning {
+                        self.timerModel.pauseTimer()
+                    } else {
+                        self.timerModel.startTimerIncrease()
+                    }
+                    return nil
                 }
                 return event
             }

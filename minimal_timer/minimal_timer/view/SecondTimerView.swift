@@ -15,7 +15,7 @@ struct SecondTimerView: View {
                 if timerModel.isRunning {
                     timerModel.stopTimer()
                 } else {
-                    timerModel.startTimer()
+                    timerModel.startTimerDecrease()
                 }
             }
     }

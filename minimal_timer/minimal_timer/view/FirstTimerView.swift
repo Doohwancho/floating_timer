@@ -27,7 +27,7 @@ struct FirstTimerView: View {
             HStack {
                 Button(action: {
                     timerModel.setTimer(with: 5)
-                    // timerModel.startTimer()
+                    // timerModel.startTimerDecrease()
                 }) {
                     Text("5m")
                 }
@@ -62,7 +62,7 @@ struct FirstTimerView: View {
                     if timerModel.isRunning {
                         timerModel.pauseTimer()
                     } else {
-                        timerModel.startTimer()
+                        timerModel.startTimerDecrease()
                     }
                 }) {
                     Text(timerModel.isRunning ? "pause" : "start")

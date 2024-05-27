@@ -8,7 +8,7 @@ Minimal Floating Timer
 
 # B. feature
 
-1. timer
+1. timer(decremental, incremental)
 2. floating
 3. keyboard shortcuts
 
@@ -16,9 +16,10 @@ Minimal Floating Timer
 
 ```
 1. esc: switch between transparent mode && minimal timer mode
-2. spacebar: 타이머 시작/중지
-3. command + 1: 5m
-4. command + 2: 10m
-5. command + 3: 25m
-6. 숫자키: 시간 설정(in minute)
+2. spacebar: start/pause decremental timer
+3. command + s: start/pause increment timer
+4. command + 1: 5m
+5. command + 2: 10m
+6. command + 3: 25m
+7. 숫자키: 시간 설정(in minute)
 ```

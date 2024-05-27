@@ -20,12 +20,24 @@ class TimerModel: ObservableObject {
     }
     var timer: Timer?
 
-    func startTimer() {
+    func startTimerDecrease() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             if let self = self, self.timeRemaining > 0 {
                 self.timeRemaining -= 1
             } else {
                 self?.stopTimer()
+            }
+        }
+        isRunning = true
+    }
+    
+    func startTimerIncrease() {
+        // timer?.invalidate()
+        // timeRemaining = 0
+
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            if let self = self {
+                self.timeRemaining += 1
             }
         }
         isRunning = true
