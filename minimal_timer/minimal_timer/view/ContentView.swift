@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var timerModel: TimerModel
+     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
+
     @State private var isFirstUIVisible = true
     @State private var firstUIWindow: NSWindow?
     @State private var accumulatedNumber: String = ""
@@ -43,7 +45,7 @@ struct ContentView: View {
                     }
                 }
             } else {
-                SecondTimerView(timerModel: timerModel)
+                SecondTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel)
                 .fixedSize()
                 .onAppear {
                     let window2 = NSApplication.shared.windows.first

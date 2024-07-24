@@ -1,6 +1,15 @@
 import Foundation
+import SwiftUI
 
-class TimerModel: ObservableObject { 
+class TimerModel: ObservableObject {
+    @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
+
+    // Public initializer
+    init(accumulatedTimeModel: AccumulatedTimeModel) {
+        self.accumulatedTimeModel = accumulatedTimeModel
+    }
+
+
     @Published var isRunning = false
     private var _timeRemaining: Int = 300
     var timeRemaining: Int {
@@ -24,6 +33,7 @@ class TimerModel: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             if let self = self, self.timeRemaining > 0 {
                 self.timeRemaining -= 1
+                self.accumulatedTimeModel.accumulatedTime += 1
             } else {
                 self?.stopTimer()
             }

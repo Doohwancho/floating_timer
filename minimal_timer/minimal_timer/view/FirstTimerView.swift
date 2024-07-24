@@ -3,7 +3,9 @@ import Foundation
 
 
 struct FirstTimerView: View {
-    @ObservedObject var timerModel = TimerModel()
+    @ObservedObject var timerModel:TimerModel
+//     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel //TODO: accumulated time not represented in FirstTimerView yet
+    
 
     var body: some View {
         VStack {
