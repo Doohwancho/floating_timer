@@ -20,7 +20,7 @@ struct SecondTimerView: View {
                         timerModel.startTimerDecrease()
                     }
                 }
-            Text(accumulatedTimeModel.getAccumulatedTime())
+            Text(accumulatedTimeModel.getAccumulatedTime() + " / " + accumulatedTimeModel.getAccumulatedTimeSinceAppStarted())
                 .font(.caption)
                 .padding(.top, 35)
                 .padding(.trailing, 10)

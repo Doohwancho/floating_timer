@@ -11,7 +11,8 @@ Minimal Floating Timer
 1. timer(decremental, incremental)
 2. floating
 3. keyboard shortcuts
-4. accumulate time
+4. total accumulate time
+5. today's accumulated time
 
 # C. shortcut
 

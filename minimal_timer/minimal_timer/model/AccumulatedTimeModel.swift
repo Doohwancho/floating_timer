@@ -8,16 +8,22 @@ class AccumulatedTimeModel: ObservableObject {
         }
     }
     
+    @Published private(set) var initialAccumulatedTime: Int = 0 
+    @Published private(set) var accumulatedTimeSinceAppStarted : Int = 0
+
+
     var accumulatedTime: Int {
         get { storedAccumulatedTime }
         set {
             objectWillChange.send()
             storedAccumulatedTime = newValue
+            accumulatedTimeSinceAppStarted = accumulatedTime - initialAccumulatedTime
         }
     }
-    
+
     init() {
         loadAccumulatedTime()
+        initialAccumulatedTime = storedAccumulatedTime
     }
 
     private func saveAccumulatedTime() {
@@ -33,11 +39,23 @@ class AccumulatedTimeModel: ObservableObject {
     func getAccumulatedTime() -> String {
         return formatAccumulatedTime(storedAccumulatedTime)
     }
+
+    func getAccumulatedTimeSinceAppStarted() -> String {
+        return formatAccumulatedTime(accumulatedTimeSinceAppStarted)
+    }
     
     func formatAccumulatedTime(_ seconds: Int) -> String {
-        let hours = seconds / 3600
-        let minutes = (seconds % 3600) / 60
-        let seconds = seconds % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        if seconds < 60 {
+            return String(format: "%02d", seconds) // Show only seconds
+        } else if seconds < 3600 {
+            let minutes = seconds / 60
+            let remainingSeconds = seconds % 60
+            return String(format: "%02d:%02d", minutes, remainingSeconds) // Show minutes:seconds
+        } else {
+            let hours = seconds / 3600
+            let minutes = (seconds % 3600) / 60
+            let remainingSeconds = seconds % 60
+            return String(format: "%02d:%02d:%02d", hours, minutes, remainingSeconds) // Show hours:minutes:seconds
+        }
     }
 }
