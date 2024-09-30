@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct SecondTimerView: View {
+struct MinimalTimerView: View {
     @ObservedObject var timerModel:TimerModel
     @ObservedObject var accumulatedTimeModel:AccumulatedTimeModel
     @Binding var inputText: String
@@ -30,7 +30,7 @@ struct SecondTimerView: View {
                         timerModel.startTimerDecrease()
                     }
                 }
-            //3. accumulated time 
+            //3. accumulated time
             Text(accumulatedTimeModel.getAccumulatedTime() + " / " + accumulatedTimeModel.getAccumulatedTimeSinceAppStarted())
                 .font(.caption)
                 .padding(.top, 35)

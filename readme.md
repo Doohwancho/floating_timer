@@ -23,7 +23,7 @@ Minimal Floating Timer
 4. command + 1: minimal timer mode
 5. command + 2: transparent mode
 6. i: insert mode(set goal)
-7. esc: exit insert mode
+7. esc, enter: exit insert mode
 ```
 
 # D. TODO

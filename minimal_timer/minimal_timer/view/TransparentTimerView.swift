@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 
 
-struct FirstTimerView: View {
+struct TransparentTimerView: View {
     @ObservedObject var timerModel:TimerModel
 //     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel //TODO: accumulated time not represented in FirstTimerView yet
     
