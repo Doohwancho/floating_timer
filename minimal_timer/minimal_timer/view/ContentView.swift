@@ -7,6 +7,16 @@ struct ContentView: View {
     @State private var isFirstUIVisible = true
     @State private var firstUIWindow: NSWindow?
     @State private var accumulatedNumber: String = ""
+    @State private var isInsertMode = false
+    private let MAX_CHAR_LIMIT = 14
+    @State private var inputText = ""
+    // Korean to English mapping
+    let koreanToEnglish: [Character: Character] = [
+        "ㅁ": "a", "ㅠ": "b", "ㅊ": "c", "ㅇ": "d", "ㄷ": "e", "ㄹ": "f", "ㅎ": "g",
+        "ㅗ": "h", "ㅑ": "i", "ㅓ": "j", "ㅏ": "k", "ㅣ": "l", "ㅡ": "m", "ㅜ": "n",
+        "ㅐ": "o", "ㅔ": "p", "ㅂ": "q", "ㄱ": "r", "ㄴ": "s", "ㅅ": "t", "ㅕ": "u",
+        "ㅍ": "v", "ㅈ": "w", "ㅌ": "x", "ㅛ": "y", "ㅋ": "z"
+    ]
 
     var body: some View {
         Group {
@@ -45,7 +55,7 @@ struct ContentView: View {
                     }
                 }
             } else {
-                SecondTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel)
+                SecondTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
                 .fixedSize()
                 .onAppear {
                     let window2 = NSApplication.shared.windows.first
@@ -82,18 +92,64 @@ struct ContentView: View {
         }
         .onAppear {
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.keyCode == 53 {  //esc = 53 of keyCode
-                    isFirstUIVisible.toggle() 
-                    // withAnimation {
-                    //     isFirstUIVisible.toggle()
-                    // }
+                //TODO - disable caplocks key during insert mode
+                
+                if event.modifierFlags.contains(.command) {
+                    switch event.keyCode {
+                    case 18: // Command + 1
+                        isFirstUIVisible = true
+                        return nil
+                    case 19: // Command + 2
+                        isFirstUIVisible = false
+                        return nil
+                    case 1: // Command + S
+                        if self.timerModel.isRunning {
+                            self.timerModel.pauseTimer()
+                        } else {
+                            self.timerModel.startTimerIncrease()
+                        }
+                        return nil
+                    case 13: // Command + W
+                        NSApplication.shared.terminate(self)
+                        return nil
+                    default:
+                        break
+                    }
+                }
+                
+                if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
+                    isInsertMode = true
+                    return nil
+                } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
+                    if isInsertMode {
+                        isInsertMode = false
+                    }
                     return nil
                 }
-                return event
-            }
-
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.keyCode == 49 { //spacebar = 49 of keyCode
+                
+                if isInsertMode {
+                    if event.keyCode == 51 { // Backspace key
+                        if event.modifierFlags.contains(.command) {
+                            // Command + Backspace: clear all text
+                            inputText = ""
+                        } else if event.modifierFlags.contains(.option) {
+                            // Option + Backspace: delete last word
+                            inputText = deleteLastWord(from: inputText)
+                        } else if !inputText.isEmpty {
+                            // Regular Backspace: remove last character
+                            inputText.removeLast()
+                        }
+                    } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
+                        let mappedChar = mapKoreanToEnglish(inputChar)
+                        inputText += String(mappedChar)
+                    } else {
+                        // Add feedback when limit is reached
+                        NSSound.beep()
+                    }
+                    return nil
+                }
+                
+                if event.keyCode == 49 { // Spacebar
                     if self.timerModel.isRunning {
                         self.timerModel.pauseTimer()
                     } else {
@@ -101,70 +157,20 @@ struct ContentView: View {
                     }
                     return nil
                 }
-                return event
-            }
-
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.modifierFlags.contains(.command) {
-                switch event.keyCode {
-                    case 18: // keyCode for 1
-                        if(self.timerModel.isRunning) {
-                            self.timerModel.stopTimer()
-                        }
-                        self.timerModel.setTimer(with: 5)
-                        return nil
-                    case 19: // keyCode for 2
-                        if(self.timerModel.isRunning) {
-                            self.timerModel.stopTimer()
-                        }
-                        self.timerModel.setTimer(with: 10)
-                        return nil
-                    case 20: // keyCode for 3
-                        if(self.timerModel.isRunning) {
-                            self.timerModel.stopTimer()
-                        }
-                        self.timerModel.setTimer(with: 25)
-                        return nil
-                    default:
-                        break
-                    }
-                }
-                return event
-            }
-
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.modifierFlags.contains(.command) && event.keyCode == 1 { // keyCode for 'S' is 1
-                    if self.timerModel.isRunning {
-                        self.timerModel.pauseTimer()
-                    } else {
-                        self.timerModel.startTimerIncrease()
-                    }
-                    return nil
-                }
-                return event
-            }
-            
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.modifierFlags.contains(.command) {
-                    return event
-                }
+                
+                // Handle number input
+                if !event.modifierFlags.contains(.command) {
                     if let characters = event.characters {
                         for character in characters {
-                        if character.isNumber {
-                            self.accumulatedNumber.append(character)
-                            self.finalizeInput()
-                            return nil
+                            if character.isNumber {
+                                self.accumulatedNumber.append(character)
+                                self.finalizeInput()
+                                return nil
+                            }
                         }
                     }
                 }
-                return event
-            }
-
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.modifierFlags.contains(.command) && event.keyCode == 13 { // keyCode for 'W' is 13
-                    NSApplication.shared.terminate(self)
-                    return nil
-                }
+                
                 return event
             }
         }
@@ -177,6 +183,34 @@ struct ContentView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.accumulatedNumber = "" // Reset for next input
         }
+    }
+    
+    private func mapKoreanToEnglish(_ char: Character) -> Character {
+        if let englishChar = koreanToEnglish[char] {
+            return englishChar
+        } else if char.isASCII && char.isLetter {
+            return char.lowercased().first!
+        } else {
+            return char
+        }
+    }
+    
+    private func deleteLastWord(from text: String) -> String {
+        guard !text.isEmpty else { return text }
+        
+        var newText = text
+        
+        // First, remove trailing spaces
+        while newText.last?.isWhitespace == true {
+            newText.removeLast()
+        }
+        
+        // Then remove the last word
+        while !newText.isEmpty && !newText.last!.isWhitespace {
+            newText.removeLast()
+        }
+        
+        return newText
     }
 }
 
