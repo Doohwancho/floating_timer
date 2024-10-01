@@ -189,7 +189,7 @@ struct ContentView: View {
         case .transparentTimer:
             return (250, 100)
         case .calendar:
-            return (300, 300)
+            return (300, 370)
         }
     }
     
