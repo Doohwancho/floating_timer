@@ -1,10 +1,9 @@
 import SwiftUI
+import AppKit
 
 struct ContentView: View {
     @ObservedObject var timerModel: TimerModel
     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
-    
-    @State private var isMinimalTimerUIVisible = true
     
     // Enum to track which UI is active
     enum ActiveView {
@@ -18,6 +17,7 @@ struct ContentView: View {
     @State private var isInsertMode = false
     private let MAX_CHAR_LIMIT = 14
     @State private var inputText = ""
+    
     // Korean to English mapping
     let koreanToEnglish: [Character: Character] = [
         "ㅁ": "a", "ㅠ": "b", "ㅊ": "c", "ㅇ": "d", "ㄷ": "e", "ㄹ": "f", "ㅎ": "g",
@@ -29,138 +29,62 @@ struct ContentView: View {
     var body: some View {
         Group {
             switch activeView {
-             case .minimalTimer:
-                MinimalTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
-                    .fixedSize()
-                    .onAppear {
-                        //주의! - 가장 처음에 뜨는 MinimalTimerView의 window${window_number}가 가장 큰 숫자여야 위치가 MinimalTimer에 맞게 설정된다! (ex. 만약 4번째 view를 추가한다면, minimal_timer_view의 window를 window3->window4로 수정하자.
-                        let window3 = NSApplication.shared.windows.first
-                        window3?.titleVisibility = .hidden
-                        window3?.titlebarAppearsTransparent = true
-                        window3?.styleMask.insert(.borderless) // Make window borderless to enable dragging
-                        window3?.isMovableByWindowBackground = true // Allow the window to be moved by dragging its background
-                        window3?.styleMask.remove(.titled)
-                        // window3?.styleMask.remove(.closable)
-                        window3?.styleMask.remove(.miniaturizable)
-                        window3?.styleMask.remove(.resizable)
-                        // window3?.styleMask.remove(.fullSizeContentView)
-                        window3?.isOpaque = false
-                        window3?.backgroundColor = NSColor.clear
-                        window3?.contentView?.wantsLayer = true
-                        window3?.contentView?.layer?.cornerRadius = 10
-                        window3?.contentView?.layer?.masksToBounds = true
-                        window3?.level = .floating
-    
-                        // Adjust the window size to fit the content
-                        // window3?.setContentSize(window2?.contentView?.fittingSize ?? .zero)
-                        window3?.setContentSize(NSSize(width: 100, height: 50))
-    
-                        // Align window to the right side of the screen
-                        if let screen = window3?.screen {
-                            let screenWidth = screen.visibleFrame.width
-                            let screenHeight = screen.visibleFrame.height
-                            let newOriginX = screenWidth - 100 // window width
-                            let newOriginY = screenHeight - 50 // vertically center
-                            window3?.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
-                        }
-                    }
-             case .transparentTimer:
-                TransparentTimerView(timerModel: self.timerModel)
-                    .fixedSize()
-                    .onAppear {
-                        let window1 = NSApplication.shared.windows.first
-                        window1?.titleVisibility = .hidden
-                        window1?.titlebarAppearsTransparent = true
-                        window1?.styleMask.insert(.borderless) // Make window borderless to enable dragging
-                        window1?.isMovableByWindowBackground = true // Allow the window to be moved by dragging its background
-                        window1?.styleMask.remove(.titled)
-                        // window1?.styleMask.remove(.closable)
-                        window1?.styleMask.remove(.miniaturizable)
-                        window1?.styleMask.remove(.resizable)
-                        // window1?.styleMask.remove(.fullSizeContentView)
-                        window1?.isOpaque = false
-                        window1?.backgroundColor = NSColor.clear
-                        window1?.contentView?.wantsLayer = true
-                        window1?.contentView?.layer?.cornerRadius = 10
-                        window1?.contentView?.layer?.masksToBounds = true
-                        window1?.level = .floating
-
-                        // Adjust the window size to fit the content
-                        // window1?.setContentSize(window1?.contentView?.fittingSize ?? .zero)
-                        window1?.setContentSize(NSSize(width: 250, height: 100))
-
-                        // Align window to the top right corner of the screen
-                        if let screen = window1?.screen {
-                            let screenWidth = screen.visibleFrame.width
-                            let screenHeight = screen.visibleFrame.height
-                            let newOriginX = screenWidth - 250 // window width
-                            let newOriginY = screenHeight - 100 // window height
-                            window1?.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
-                        }
-                    }
-             case .calendar:
-                CalendarWithDailyTimeView()
-                    .fixedSize()
-                    .onAppear {
-                        let window2 = NSApplication.shared.windows.first
-                        window2?.titleVisibility = .hidden
-                        window2?.titlebarAppearsTransparent = true
-                        window2?.styleMask.insert(.borderless) // Make window borderless to enable dragging
-                        window2?.isMovableByWindowBackground = true // Allow the window to be moved by dragging its background
-                        window2?.styleMask.remove(.titled)
-                        // window2?.styleMask.remove(.closable)
-                        window2?.styleMask.remove(.miniaturizable)
-                        window2?.styleMask.remove(.resizable)
-                        // window2?.styleMask.remove(.fullSizeContentView)
-                        window2?.isOpaque = false
-                        window2?.backgroundColor = NSColor.clear
-                        window2?.contentView?.wantsLayer = true
-                        window2?.contentView?.layer?.cornerRadius = 10
-                        window2?.contentView?.layer?.masksToBounds = true
-                        window2?.level = .floating
-
-                        // Adjust the window size to fit the content
-                        // window2?.setContentSize(window1?.contentView?.fittingSize ?? .zero)
-                        window2?.setContentSize(NSSize(width: 300, height: 300))
-
-                        // Align window to the top right corner of the screen
-                        if let screen = window2?.screen {
-                            let screenWidth = screen.visibleFrame.width
-                            let screenHeight = screen.visibleFrame.height
-                            let newOriginX = screenWidth - 300 // window width
-                            let newOriginY = screenHeight - 300 // window height
-                            window2?.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
-                        }
-                    }
+                case .minimalTimer:
+                    MinimalTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
+                        .frame(width: 100, height: 50)
+                case .transparentTimer:
+                    TransparentTimerView(timerModel: self.timerModel)
+                        .frame(width: 250, height: 100)
+                case .calendar:
+                    CalendarWithDailyTimeView()
+                        .frame(width: 300, height: 300)
                 }
             }
+            .background(WindowAccessor { window in
+                configureWindow(window)
+            })
                 .onAppear {
                     NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                         //TODO - disable caplocks key during insert mode
                         
                         if event.modifierFlags.contains(.command) {
                             switch event.keyCode {
-                            case 18: // Command + 1
-                                activeView = .minimalTimer
-                                return nil
-                            case 19: // Command + 2
-                                activeView = .transparentTimer
-                                return nil
-                            case 20: // Command + 3
-                                activeView = .calendar
-                                return nil
-                            case 1: // Command + S
-                                if self.timerModel.isRunning {
-                                    self.timerModel.pauseTimer()
-                                } else {
-                                    self.timerModel.startTimerIncrease()
-                                }
-                                return nil
-                            case 13: // Command + W
-                                NSApplication.shared.terminate(self)
-                                return nil
-                            default:
-                                break
+                                case 18: // Command + 1
+                                    activeView = .minimalTimer
+                                    DispatchQueue.main.async {
+                                        if let window = NSApplication.shared.windows.first {
+                                            configureWindow(window)
+                                        }
+                                    }
+                                    return nil
+                                case 19: // Command + 2
+                                    activeView = .transparentTimer
+                                    DispatchQueue.main.async {
+                                        if let window = NSApplication.shared.windows.first {
+                                            configureWindow(window)
+                                        }
+                                    }
+                                    return nil
+                                case 20: // Command + 3
+                                    activeView = .calendar
+                                    DispatchQueue.main.async {
+                                        if let window = NSApplication.shared.windows.first {
+                                            configureWindow(window)
+                                        }
+                                    }
+                                    return nil
+                                case 1: // Command + S
+                                    if self.timerModel.isRunning {
+                                        self.timerModel.pauseTimer()
+                                    } else {
+                                        self.timerModel.startTimerIncrease()
+                                    }
+                                    return nil
+                                case 13: // Command + W
+                                    NSApplication.shared.terminate(self)
+                                    return nil
+                                default:
+                                    break
                             }
                         }
                         
@@ -222,6 +146,53 @@ struct ContentView: View {
                     }
                 }
         }
+    
+    private func configureWindow(_ window: NSWindow?) {
+        guard let window = window else { return }
+        
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.styleMask.insert(.borderless)
+        window.styleMask.remove(.titled)
+        window.styleMask.remove(.closable)
+        window.styleMask.remove(.miniaturizable)
+        window.styleMask.remove(.resizable)
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.isMovableByWindowBackground = true
+        window.level = .floating
+        
+        window.contentView?.wantsLayer = true
+        window.contentView?.layer?.cornerRadius = 10
+        window.contentView?.layer?.masksToBounds = true
+        
+        positionWindow(window)
+    }
+    
+    private func positionWindow(_ window: NSWindow) {
+        let (width, height) = getWindowSize()
+        window.setContentSize(NSSize(width: width, height: height))
+        
+        if let screen = window.screen {
+            let screenWidth = screen.visibleFrame.width
+            let screenHeight = screen.visibleFrame.height
+            let newOriginX = screenWidth - width
+            let newOriginY = screenHeight - height
+            window.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
+        }
+    }
+    
+    private func getWindowSize() -> (CGFloat, CGFloat) {
+        switch activeView {
+        case .minimalTimer:
+            return (100, 50)
+        case .transparentTimer:
+            return (250, 100)
+        case .calendar:
+            return (300, 300)
+        }
+    }
+    
     private func finalizeInput() {
         if let finalNumber = Int(self.accumulatedNumber) {
             self.timerModel.setTimer(with: finalNumber)
@@ -257,6 +228,20 @@ struct ContentView: View {
         }
         
         return newText
+    }
+    
+    struct WindowAccessor: NSViewRepresentable {
+        let callback: (NSWindow?) -> Void
+        
+        func makeNSView(context: Context) -> NSView {
+            let view = NSView()
+            DispatchQueue.main.async {
+                self.callback(view.window)
+            }
+            return view
+        }
+        
+        func updateNSView(_ nsView: NSView, context: Context) {}
     }
 }
 // #Preview {
