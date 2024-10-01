@@ -31,7 +31,8 @@ struct MinimalTimerView: View {
                     }
                 }
             //3. accumulated time
-            Text(accumulatedTimeModel.getAccumulatedTime() + " / " + accumulatedTimeModel.getAccumulatedTimeSinceAppStarted())
+            Text(accumulatedTimeModel.getTotalAccumulatedTime() + " / " 
+                 + accumulatedTimeModel.getTodayAccumulatedTime())
                 .font(.caption)
                 .padding(.top, 35)
                 .padding(.trailing, 10)

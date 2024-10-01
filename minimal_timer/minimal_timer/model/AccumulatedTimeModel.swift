@@ -2,46 +2,64 @@ import Foundation
 import SwiftUI
 
 class AccumulatedTimeModel: ObservableObject {
-    @Published private var storedAccumulatedTime: Int = 0 {
+    /**
+     A. variables
+    */
+    //1. 총 기록한 시간 저장 & 로드
+    @Published private var totalAccumulatedTime: Int = 0 {
         didSet {
-            saveAccumulatedTime()
+            saveTotalAccumulatedTime()
+        }
+    }
+    var accumulatedTime: Int {
+        get { totalAccumulatedTime }
+        set {
+            objectWillChange.send()
+            totalAccumulatedTime = newValue
+            updateDailyAccumulatedTime()
         }
     }
     
-    @Published private(set) var initialAccumulatedTime: Int = 0 
-    @Published private(set) var accumulatedTimeSinceAppStarted : Int = 0
+    //2. 일일별 기록한 시간 저장 & 로드
     @Published private var dailyAccumulatedTimes: [String: Int] = [:] {
         didSet {
             saveDailyAccumulatedTimes()
         }
     }
+    //3. 오늘 추가된 시간
+    @Published private(set) var todayAccumulatedTime: Int = 0
+    private let calendar = Calendar.current
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+    
 
-    var accumulatedTime: Int {
-        get { storedAccumulatedTime }
-        set {
-            objectWillChange.send()
-            storedAccumulatedTime = newValue
-            accumulatedTimeSinceAppStarted = accumulatedTime - initialAccumulatedTime
-            updateDailyAccumulatedTime()
-        }
-    }
-
+    /**
+     B. init
+    */
     init() {
-        loadAccumulatedTime()
+        loadTotalAccumulatedTime()
         loadDailyAccumulatedTimes()
-        initialAccumulatedTime = storedAccumulatedTime
+        initializeTodayAccumulatedTime()
     }
 
-    private func saveAccumulatedTime() {
-        UserDefaults.standard.set(storedAccumulatedTime, forKey: "accumulatedTime")
+    /**
+     C. variable related methods
+    */
+    //1. 총 기록한 시간 저장 & 로드
+    private func saveTotalAccumulatedTime() {
+        UserDefaults.standard.set(totalAccumulatedTime, forKey: "totalAccumulatedTime")
     }
 
-    private func loadAccumulatedTime() {
-        if let savedTime = UserDefaults.standard.value(forKey: "accumulatedTime") as? Int {
-            storedAccumulatedTime = savedTime
+    private func loadTotalAccumulatedTime() {
+        if let savedTime = UserDefaults.standard.value(forKey: "totalAccumulatedTime") as? Int {
+            totalAccumulatedTime = savedTime
         }
     }
     
+    //2. 일일별 기록한 시간 저장 & 로드 & 업데이트
     private func saveDailyAccumulatedTimes() {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(dailyAccumulatedTimes) {
@@ -59,25 +77,39 @@ class AccumulatedTimeModel: ObservableObject {
     }
     
     private func updateDailyAccumulatedTime() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
         let today = dateFormatter.string(from: Date())
-        
-        if let existingTime = dailyAccumulatedTimes[today] {
-            dailyAccumulatedTimes[today] = existingTime + 1
-        } else {
-            dailyAccumulatedTimes[today] = 1
-        }
-    }
-
-    func getAccumulatedTime() -> String {
-        return formatAccumulatedTime(storedAccumulatedTime)
-    }
-
-    func getAccumulatedTimeSinceAppStarted() -> String {
-        return formatAccumulatedTime(accumulatedTimeSinceAppStarted)
+        todayAccumulatedTime += 1
+        dailyAccumulatedTimes[today] = todayAccumulatedTime
     }
     
+    //3. 오늘 추가된 시간 초기화
+    private func initializeTodayAccumulatedTime() {
+        let today = dateFormatter.string(from: Date())
+        todayAccumulatedTime = dailyAccumulatedTimes[today] ?? 0
+    }
+    
+    /**
+     D. getters
+    */
+    func getTotalAccumulatedTime() -> String {
+        return formatAccumulatedTime(totalAccumulatedTime)
+    }
+
+    func getTodayAccumulatedTime() -> String {
+        return formatAccumulatedTime(todayAccumulatedTime)
+    }
+    
+    func getDailyAccumulatedTimes() -> [String: Int] {
+        return dailyAccumulatedTimes
+    }
+    
+    func getFormattedDailyAccumulatedTimes() -> [String: String] {
+        return dailyAccumulatedTimes.mapValues { formatAccumulatedTime($0) }
+    }
+    
+    /**
+     E. formatter
+    */
     func formatAccumulatedTime(_ seconds: Int) -> String {
         if seconds < 60 {
             return String(format: "%02d", seconds) // Show only seconds
@@ -91,13 +123,5 @@ class AccumulatedTimeModel: ObservableObject {
 //            let remainingSeconds = seconds % 60
             return String(format: "%02d:%02d", hours, minutes) // Show hours:minutes
         }
-    }
-    
-    func getDailyAccumulatedTimes() -> [String: Int] {
-        return dailyAccumulatedTimes
-    }
-    
-    func getFormattedDailyAccumulatedTimes() -> [String: String] {
-        return dailyAccumulatedTimes.mapValues { formatAccumulatedTime($0) }
     }
 }

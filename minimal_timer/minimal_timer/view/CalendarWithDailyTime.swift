@@ -98,6 +98,9 @@ struct CalendarWithDailyTimeView: View {
     
     private func accumulatedTimeForDate(_ date: Date) -> Int {
         let dateString = dateFormatter.string(from: date)
+        if Calendar.current.isDateInToday(date) {
+            return accumulatedTimeModel.todayAccumulatedTime
+        }
         return accumulatedTimeModel.getDailyAccumulatedTimes()[dateString] ?? 0
     }
 }
