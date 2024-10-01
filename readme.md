@@ -19,17 +19,17 @@ Minimal Floating Timer
 
 ```
 1. spacebar: start/pause decremental timer
-2. command + s: start/pause increment timer
+2. command + s: start/stop increment timer
 3. 숫자키: 시간 설정(in minute)
 4. command + 1: minimal timer mode
 5. command + 2: transparent timer mode
 6. command + 3: calendar mode
-7. i: insert mode(set goal)
+7. i: insert mode(set goal on minimal_timer)
 8. esc, enter: exit insert mode
+9. h,l to switch months in calendar
 ```
 
 # D. TODO
 
 1. insert mode에서 capslock 눌렀을 때 부숴진 ascii code 입력되는 문제 해결하기
-2. 매일 시간 추가한게 calendar의 today에 추가되는 기능 추가 (12시 reset)
-3. 앱을 닫을 때 시간 저장 시 { date:시간 } 으로 저장하고, 앱 로드시 calendar에서 파싱
+2. minimal_timer에 goal 추가 시 한글도 입력되는 기능 추가하기

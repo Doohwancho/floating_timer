@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var isInsertMode = false
     private let MAX_CHAR_LIMIT = 14
     @State private var inputText = ""
+    @State private var currentDate = Date()
     
     // Korean to English mapping
     let koreanToEnglish: [Character: Character] = [
@@ -36,7 +37,7 @@ struct ContentView: View {
                     TransparentTimerView(timerModel: self.timerModel)
                         .frame(width: 250, height: 100)
                 case .calendar:
-                    CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel)
+                    CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
                         .frame(width: 300, height: 370)
                 }
             }
@@ -82,6 +83,19 @@ struct ContentView: View {
                                 return nil
                             case 13: // Command + W
                                 NSApplication.shared.terminate(self)
+                                return nil
+                            default:
+                                break
+                        }
+                    }
+                    
+                    if self.activeView == .calendar {
+                        switch event.keyCode {
+                            case 4: // 'h' key
+                                self.currentDate = Calendar.current.date(byAdding: .month, value: -1, to: self.currentDate) ?? self.currentDate
+                                return nil
+                            case 37: // 'l' key
+                                self.currentDate = Calendar.current.date(byAdding: .month, value: 1, to: self.currentDate) ?? self.currentDate
                                 return nil
                             default:
                                 break

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CalendarWithDailyTimeView: View {
     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
-    @State private var currentDate = Date()
+    @Binding var currentDate: Date
     @State private var selectedDate: Date?
     
     private let calendar: Calendar = {
@@ -88,11 +88,11 @@ struct CalendarWithDailyTimeView: View {
         return dates
     }
     
-    private func previousMonth() {
+    func previousMonth() {
         currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
     }
     
-    private func nextMonth() {
+    func nextMonth() {
         currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
     }
     
