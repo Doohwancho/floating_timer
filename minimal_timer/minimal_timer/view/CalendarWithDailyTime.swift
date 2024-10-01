@@ -9,6 +9,7 @@ struct CalendarWithDailyTimeView: View {
         calendar.firstWeekday = 2 // 2 represents Monday
         return calendar
     }()
+    
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "d"
@@ -104,13 +105,42 @@ struct DayView: View {
         return formatter
     }()
     
+    private let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+    
+    private var isToday: Bool {
+        calendar.isDateInToday(date)
+    }
+    
+    private var colorIntensity: Double {
+        let components = calendar.dateComponents([.hour, .minute], from: date)
+        let totalMinutes = Double(components.hour! * 60 + components.minute!)
+        return totalMinutes / (24 * 60)
+    }
+    
     var body: some View {
-        Text(dateFormatter.string(from: date))
-            .frame(height: 32)
-            .background(isSelected ? Color.blue : Color.clear)
-            .cornerRadius(16)
-            .foregroundColor(isSelected ? .white : .primary)
-            .opacity(calendar.isDateInToday(date) ? 1 : 0.5)
+        VStack {
+            Text(dateFormatter.string(from: date))
+                .font(.system(size: 14, weight: .medium))
+            Text(timeFormatter.string(from: date))
+                .font(.system(size: 10))
+        }
+        .frame(height: 40)
+        .frame(maxWidth: .infinity)
+        .background(
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.red.opacity(colorIntensity * 0.5))
+                if isToday {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.blue, lineWidth: 2)
+                }
+            }
+        )
+        .foregroundColor(isSelected ? .blue : .primary)
     }
 }
 
