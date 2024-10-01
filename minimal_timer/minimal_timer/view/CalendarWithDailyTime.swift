@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CalendarWithDailyTimeView: View {
+    @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
     @State private var currentDate = Date()
     @State private var selectedDate: Date?
     
@@ -12,7 +13,7 @@ struct CalendarWithDailyTimeView: View {
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "d"
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
     
@@ -48,7 +49,9 @@ struct CalendarWithDailyTimeView: View {
                         .foregroundColor(.secondary)
                 }
                 ForEach(days(), id: \.self) { date in
-                    DayView(date: date, isSelected: Calendar.current.isDate(date, inSameDayAs: selectedDate ?? Date()))
+                    DayView(date: date, 
+                            isSelected: Calendar.current.isDate(date, inSameDayAs: selectedDate ?? Date()),
+                                accumulatedSeconds: accumulatedTimeForDate(date))
                         .onTapGesture {
                             selectedDate = date
                         }
@@ -92,11 +95,17 @@ struct CalendarWithDailyTimeView: View {
     private func nextMonth() {
         currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
     }
+    
+    private func accumulatedTimeForDate(_ date: Date) -> Int {
+        let dateString = dateFormatter.string(from: date)
+        return accumulatedTimeModel.getDailyAccumulatedTimes()[dateString] ?? 0
+    }
 }
 
 struct DayView: View {
     let date: Date
     let isSelected: Bool
+    let accumulatedSeconds: Int
     
     private let calendar = Calendar.current
     private let dateFormatter: DateFormatter = {
@@ -105,27 +114,26 @@ struct DayView: View {
         return formatter
     }()
     
-    private let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
-    
     private var isToday: Bool {
         calendar.isDateInToday(date)
     }
     
     private var colorIntensity: Double {
-        let components = calendar.dateComponents([.hour, .minute], from: date)
-        let totalMinutes = Double(components.hour! * 60 + components.minute!)
-        return totalMinutes / (24 * 60)
+        let hours = Double(accumulatedSeconds) / 3600
+        return min(hours / 6, 1.0) // 6 hours as maximum intensity
+    }
+    
+    private var formattedTime: String {
+        let hours = accumulatedSeconds / 3600
+        let minutes = (accumulatedSeconds % 3600) / 60
+        return String(format: "%02d:%02d", hours, minutes)
     }
     
     var body: some View {
         VStack {
             Text(dateFormatter.string(from: date))
                 .font(.system(size: 14, weight: .medium))
-            Text(timeFormatter.string(from: date))
+            Text(formattedTime)
                 .font(.system(size: 10))
         }
         .frame(height: 40)
@@ -133,7 +141,7 @@ struct DayView: View {
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.red.opacity(colorIntensity * 0.5))
+                    .fill(Color.green.opacity(colorIntensity * 0.9))
                 if isToday {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.blue, lineWidth: 2)

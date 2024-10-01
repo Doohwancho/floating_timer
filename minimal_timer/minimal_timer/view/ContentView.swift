@@ -36,115 +36,115 @@ struct ContentView: View {
                     TransparentTimerView(timerModel: self.timerModel)
                         .frame(width: 250, height: 100)
                 case .calendar:
-                    CalendarWithDailyTimeView()
-                        .frame(width: 300, height: 300)
+                    CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel)
+                        .frame(width: 300, height: 370)
                 }
             }
             .background(WindowAccessor { window in
                 configureWindow(window)
             })
-                .onAppear {
-                    NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                        //TODO - disable caplocks key during insert mode
-                        
-                        if event.modifierFlags.contains(.command) {
-                            switch event.keyCode {
-                                case 18: // Command + 1
-                                    activeView = .minimalTimer
-                                    DispatchQueue.main.async {
-                                        if let window = NSApplication.shared.windows.first {
-                                            configureWindow(window)
-                                        }
-                                    }
-                                    return nil
-                                case 19: // Command + 2
-                                    activeView = .transparentTimer
-                                    DispatchQueue.main.async {
-                                        if let window = NSApplication.shared.windows.first {
-                                            configureWindow(window)
-                                        }
-                                    }
-                                    return nil
-                                case 20: // Command + 3
-                                    activeView = .calendar
-                                    DispatchQueue.main.async {
-                                        if let window = NSApplication.shared.windows.first {
-                                            configureWindow(window)
-                                        }
-                                    }
-                                    return nil
-                                case 1: // Command + S
-                                    if self.timerModel.isRunning {
-                                        self.timerModel.pauseTimer()
-                                    } else {
-                                        self.timerModel.startTimerIncrease()
-                                    }
-                                    return nil
-                                case 13: // Command + W
-                                    NSApplication.shared.terminate(self)
-                                    return nil
-                                default:
-                                    break
-                            }
-                        }
-                        
-                        if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
-                            isInsertMode = true
-                            return nil
-                        } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                            if isInsertMode {
-                                isInsertMode = false
-                            }
-                            return nil
-                        }
-                        
-                        if isInsertMode {
-                            if event.keyCode == 51 { // Backspace key
-                                if event.modifierFlags.contains(.command) {
-                                    // Command + Backspace: clear all text
-                                    inputText = ""
-                                } else if event.modifierFlags.contains(.option) {
-                                    // Option + Backspace: delete last word
-                                    inputText = deleteLastWord(from: inputText)
-                                } else if !inputText.isEmpty {
-                                    // Regular Backspace: remove last character
-                                    inputText.removeLast()
-                                }
-                            } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
-                                let mappedChar = mapKoreanToEnglish(inputChar)
-                                inputText += String(mappedChar)
-                            } else {
-                                // Add feedback when limit is reached
-                                NSSound.beep()
-                            }
-                            return nil
-                        }
-                        
-                        if event.keyCode == 49 { // Spacebar
-                            if self.timerModel.isRunning {
-                                self.timerModel.pauseTimer()
-                            } else {
-                                self.timerModel.startTimerDecrease()
-                            }
-                            return nil
-                        }
-                        
-                        // Handle number input
-                        if !event.modifierFlags.contains(.command) {
-                            if let characters = event.characters {
-                                for character in characters {
-                                    if character.isNumber {
-                                        self.accumulatedNumber.append(character)
-                                        self.finalizeInput()
-                                        return nil
+            .onAppear {
+                NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                    //TODO - disable caplocks key during insert mode
+                    
+                    if event.modifierFlags.contains(.command) {
+                        switch event.keyCode {
+                            case 18: // Command + 1
+                                activeView = .minimalTimer
+                                DispatchQueue.main.async {
+                                    if let window = NSApplication.shared.windows.first {
+                                        configureWindow(window)
                                     }
                                 }
-                            }
+                                return nil
+                            case 19: // Command + 2
+                                activeView = .transparentTimer
+                                DispatchQueue.main.async {
+                                    if let window = NSApplication.shared.windows.first {
+                                        configureWindow(window)
+                                    }
+                                }
+                                return nil
+                            case 20: // Command + 3
+                                activeView = .calendar
+                                DispatchQueue.main.async {
+                                    if let window = NSApplication.shared.windows.first {
+                                        configureWindow(window)
+                                    }
+                                }
+                                return nil
+                            case 1: // Command + S
+                                if self.timerModel.isRunning {
+                                    self.timerModel.pauseTimer()
+                                } else {
+                                    self.timerModel.startTimerIncrease()
+                                }
+                                return nil
+                            case 13: // Command + W
+                                NSApplication.shared.terminate(self)
+                                return nil
+                            default:
+                                break
                         }
-                        
-                        return event
                     }
+                    
+                    if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
+                        isInsertMode = true
+                        return nil
+                    } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
+                        if isInsertMode {
+                            isInsertMode = false
+                        }
+                        return nil
+                    }
+                    
+                    if isInsertMode {
+                        if event.keyCode == 51 { // Backspace key
+                            if event.modifierFlags.contains(.command) {
+                                // Command + Backspace: clear all text
+                                inputText = ""
+                            } else if event.modifierFlags.contains(.option) {
+                                // Option + Backspace: delete last word
+                                inputText = deleteLastWord(from: inputText)
+                            } else if !inputText.isEmpty {
+                                // Regular Backspace: remove last character
+                                inputText.removeLast()
+                            }
+                        } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
+                            let mappedChar = mapKoreanToEnglish(inputChar)
+                            inputText += String(mappedChar)
+                        } else {
+                            // Add feedback when limit is reached
+                            NSSound.beep()
+                        }
+                        return nil
+                    }
+                    
+                    if event.keyCode == 49 { // Spacebar
+                        if self.timerModel.isRunning {
+                            self.timerModel.pauseTimer()
+                        } else {
+                            self.timerModel.startTimerDecrease()
+                        }
+                        return nil
+                    }
+                    
+                    // Handle number input
+                    if !event.modifierFlags.contains(.command) {
+                        if let characters = event.characters {
+                            for character in characters {
+                                if character.isNumber {
+                                    self.accumulatedNumber.append(character)
+                                    self.finalizeInput()
+                                    return nil
+                                }
+                            }
+                        }
+                    }
+                    
+                    return event
                 }
+            }
         }
     
     private func configureWindow(_ window: NSWindow?) {
