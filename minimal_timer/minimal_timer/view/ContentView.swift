@@ -194,8 +194,8 @@ struct ContentView: View {
         if let screen = window.screen {
             let screenWidth = screen.visibleFrame.width
             let screenHeight = screen.visibleFrame.height
-            let newOriginX = screenWidth - width
-            let newOriginY = screenHeight - height
+            let newOriginX = screenWidth - width - 5
+            let newOriginY = screenHeight - height - 37
             window.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
         }
     }
@@ -207,7 +207,7 @@ struct ContentView: View {
         case .transparentTimer:
             return (250, 100)
         case .calendar:
-            return (300, 370)
+            return (300, 375)
         }
     }
     
