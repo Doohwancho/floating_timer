@@ -122,7 +122,10 @@ struct DayView: View {
     }
     
     private var colorIntensity: Double {
-        let hours = Double(accumulatedSeconds) / 3600
+        if(accumulatedSeconds == 0) {
+            return 0
+        }
+        let hours = Double(accumulatedSeconds) / 3600 + 0.1 //1분이라도 했으면 mark green
         return min(hours / 6, 1.0) // 6 hours as maximum intensity
     }
     
@@ -144,7 +147,7 @@ struct DayView: View {
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.green.opacity(colorIntensity * 0.9))
+                    .fill(Color.green.opacity(colorIntensity))
                 if isToday {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.blue, lineWidth: 2)
