@@ -9,7 +9,6 @@ class TimerModel: ObservableObject {
         self.accumulatedTimeModel = accumulatedTimeModel
     }
 
-
     @Published var isRunning = false
     private var _timeRemaining: Int = 300
     var timeRemaining: Int {
@@ -34,6 +33,9 @@ class TimerModel: ObservableObject {
             if let self = self, self.timeRemaining > 0 {
                 self.timeRemaining -= 1
                 self.accumulatedTimeModel.accumulatedTime += 1
+                if self.timeRemaining == 0 {
+                    self.playAlarmSound()
+                }
             } else {
                 self?.stopTimer()
             }
@@ -86,5 +88,9 @@ class TimerModel: ObservableObject {
         let minutes = seconds / 60
         let remainingSeconds = seconds % 60
         return String(format: "%02d:%02d", minutes, remainingSeconds)
+    }
+    
+    private func playAlarmSound() {
+        NSSound.beep()
     }
 }
