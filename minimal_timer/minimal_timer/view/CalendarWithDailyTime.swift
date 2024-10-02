@@ -56,7 +56,7 @@ struct CalendarWithDailyTimeView: View {
                 ForEach(days(), id: \.self) { date in
                     DayView(date: date, 
                             isSelected: Calendar.current.isDate(date, inSameDayAs: selectedDate ?? Date()),
-                                accumulatedSeconds: accumulatedTimeForDate(date))
+                            accumulatedSeconds: accumulatedTimeForDate(date))
                         .onTapGesture {
                             selectedDate = date
                         }
@@ -157,6 +157,9 @@ struct DayView: View {
                     if isToday {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.blue, lineWidth: 2)
+                            //TODO - calendar에서 다음 달로 넘겼을 때, 오늘 위치의 checkmark의 형상이 남아있는 문제가 있다.
+                            //.id()에 유니크한 값을 넣어 강제로 re-render을 시도했지만 실패했다.
+                            //.id("today-border-\(date)") // Unique ID for today's border for force-re-render
                     }
                 }
             )
@@ -169,6 +172,9 @@ struct DayView: View {
                     .padding(2)
                     .background(Circle().fill(Color.white))
                     .offset(x: -1.5, y: 2)
+                    //TODO - calendar에서 다음 달로 넘겼을 때, 오늘 위치의 checkmark의 형상이 남아있는 문제가 있다.
+                    //.id()에 유니크한 값을 넣어 강제로 re-render을 시도했지만 실패했다.
+                    //.id("checkmark-\(date)-\(accumulatedSeconds)") // Unique ID for checkmark for force-re-render
             }
         }
     }
