@@ -136,25 +136,36 @@ struct DayView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(dateFormatter.string(from: date))
-                .font(.system(size: 14, weight: .medium))
-            Text(formattedTime)
-                .font(.system(size: 10))
-        }
-        .frame(height: 40)
-        .frame(maxWidth: .infinity)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.green.opacity(colorIntensity))
-                if isToday {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.blue, lineWidth: 2)
-                }
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                Text(dateFormatter.string(from: date))
+                    .font(.system(size: 14, weight: .medium))
+                Text(formattedTime)
+                    .font(.system(size: 10))
             }
-        )
-        .foregroundColor(isSelected ? .blue : .primary)
+            .frame(height: 40)
+            .frame(maxWidth: .infinity)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.green.opacity(colorIntensity))
+                    if isToday {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue, lineWidth: 2)
+                    }
+                }
+            )
+            .foregroundColor(isSelected ? .blue : .primary)
+            
+            if accumulatedSeconds > 0 {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.blue)
+                    .padding(2)
+                    .background(Circle().fill(Color.white))
+                    .offset(x: -1.5, y: 2)
+            }
+        }
     }
 }
 
