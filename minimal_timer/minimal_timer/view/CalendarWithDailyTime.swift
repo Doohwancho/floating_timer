@@ -34,8 +34,13 @@ struct CalendarWithDailyTimeView: View {
                 Button(action: previousMonth) {
                     Image(systemName: "chevron.left")
                 }
-                Text(monthYearFormatter.string(from: currentDate))
-                    .font(.headline)
+                VStack {
+                    Text(monthYearFormatter.string(from: currentDate))
+                        .font(.headline)
+                    Text("\(accumulatedTimeModel.getCurrentStreak()) / \(accumulatedTimeModel.getMaxConsecutiveDays())")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
                 Button(action: nextMonth) {
                     Image(systemName: "chevron.right")
                 }

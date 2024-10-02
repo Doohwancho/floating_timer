@@ -45,6 +45,8 @@ struct ContentView: View {
                 configureWindow(window)
             })
             .onAppear {
+                accumulatedTimeModel.recalculateStreaks()
+                
                 NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                     //TODO - disable caplocks key during insert mode
                     
@@ -158,6 +160,8 @@ struct ContentView: View {
                     
                     return event
                 }
+            } .onDisappear { //before app terminates, update max streaks
+                self.accumulatedTimeModel.updateStreaks()
             }
         }
     

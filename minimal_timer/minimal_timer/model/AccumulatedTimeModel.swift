@@ -8,7 +8,7 @@ class AccumulatedTimeModel: ObservableObject {
     //1. 총 기록한 시간 저장 & 로드
     @Published private var totalAccumulatedTime: Int = 0 {
         didSet {
-            saveTotalAccumulatedTime()
+            saveTotalAccumulatedTime() //saved everytime it changes (didset {})
         }
     }
     var accumulatedTime: Int {
@@ -23,7 +23,7 @@ class AccumulatedTimeModel: ObservableObject {
     //2. 일일별 기록한 시간 저장 & 로드
     @Published private var dailyAccumulatedTimes: [String: Int] = [:] {
         didSet {
-            saveDailyAccumulatedTimes()
+            saveDailyAccumulatedTimes() //saved everytime it changes (didset {})
         }
     }
     //3. 오늘 추가된 시간
@@ -35,6 +35,14 @@ class AccumulatedTimeModel: ObservableObject {
         return formatter
     }()
     
+    //4. max & current streaks
+    @Published private var maxConsecutiveDays: Int = 0 {
+        didSet {
+            saveMaxConsecutiveDays() //saved everytime it changes (didset {})
+        }
+    }
+    @Published private(set) var currentStreak: Int = 0
+
 
     /**
      B. init
@@ -43,6 +51,8 @@ class AccumulatedTimeModel: ObservableObject {
         loadTotalAccumulatedTime()
         loadDailyAccumulatedTimes()
         initializeTodayAccumulatedTime()
+        loadMaxConsecutiveDays()
+        calculateCurrentStreak()
     }
 
     /**
@@ -88,6 +98,48 @@ class AccumulatedTimeModel: ObservableObject {
         todayAccumulatedTime = dailyAccumulatedTimes[today] ?? 0
     }
     
+    //4. max & current streaks
+    private func saveMaxConsecutiveDays() {
+        UserDefaults.standard.set(maxConsecutiveDays, forKey: "maxConsecutiveDays")
+    }
+
+    private func loadMaxConsecutiveDays() {
+        maxConsecutiveDays = UserDefaults.standard.integer(forKey: "maxConsecutiveDays")
+    }
+    
+    private func calculateCurrentStreak() {
+        let sortedDates = dailyAccumulatedTimes.keys.sorted(by: >)
+        var streak = 0
+        var currentDate = calendar.startOfDay(for: Date())
+
+        for dateString in sortedDates {
+            if let date = dateFormatter.date(from: dateString),
+               let dayDifference = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: currentDate).day {
+                if dayDifference <= streak {
+                    streak += 1
+                    currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate)!
+                } else {
+                    break
+                }
+            }
+        }
+
+        currentStreak = streak
+        if currentStreak > maxConsecutiveDays {
+            maxConsecutiveDays = currentStreak
+        }
+    }
+    
+    func updateStreaks() {
+        calculateCurrentStreak()
+    }
+    
+    // Add this method to manually trigger streak calculation
+    func recalculateStreaks() {
+        calculateCurrentStreak()
+        objectWillChange.send()
+    }
+
     /**
      D. getters
     */
@@ -105,6 +157,14 @@ class AccumulatedTimeModel: ObservableObject {
     
     func getFormattedDailyAccumulatedTimes() -> [String: String] {
         return dailyAccumulatedTimes.mapValues { formatAccumulatedTime($0) }
+    }
+    
+    func getMaxConsecutiveDays() -> Int {
+        return maxConsecutiveDays
+    }
+
+    func getCurrentStreak() -> Int {
+        return currentStreak
     }
     
     /**
