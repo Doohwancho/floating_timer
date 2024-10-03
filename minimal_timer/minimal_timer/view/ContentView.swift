@@ -4,6 +4,7 @@ import AppKit
 struct ContentView: View {
     @ObservedObject var timerModel: TimerModel
     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
+    @Environment(\.scenePhase) private var scenePhase //observer to check whether app is active
     
     // Enum to track which UI is active
     enum ActiveView {
@@ -40,6 +41,9 @@ struct ContentView: View {
                     CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
                         .frame(width: 300, height: 370)
                 }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                accumulatedTimeModel.scenePhase = newPhase
             }
             .background(WindowAccessor { window in
                 configureWindow(window)
@@ -262,7 +266,3 @@ struct ContentView: View {
         func updateNSView(_ nsView: NSView, context: Context) {}
     }
 }
-// #Preview {
-// ContentView()
-// }
-

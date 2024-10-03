@@ -26,6 +26,7 @@ class AccumulatedTimeModel: ObservableObject {
             saveDailyAccumulatedTimes() //saved everytime it changes (didset {})
         }
     }
+    
     //3. 오늘 추가된 시간
     @Published private(set) var todayAccumulatedTime: Int = 0
     private let calendar = Calendar.current
@@ -35,7 +36,19 @@ class AccumulatedTimeModel: ObservableObject {
         return formatter
     }()
     
-    //4. max & current streaks
+    //4. app이 running 하는 상태에서 날짜가 바뀐 경우, 이전 날짜의 누적시간을 저장하고 현재 todayAccumulatedTime을 0으로 reset하기 위한 변수
+    private var lastActiveDate: Date?
+    
+    //app이 active한지 체크하는 observer
+    @Published var scenePhase: ScenePhase = .inactive {
+        didSet {
+            if scenePhase == .active {
+                checkForDateChange()
+            }
+        }
+    }
+    
+    //5. max & current streaks
     @Published private var maxConsecutiveDays: Int = 0 {
         didSet {
             saveMaxConsecutiveDays() //saved everytime it changes (didset {})
@@ -53,8 +66,13 @@ class AccumulatedTimeModel: ObservableObject {
         initializeTodayAccumulatedTime()
         loadMaxConsecutiveDays()
         calculateCurrentStreak()
+        lastActiveDate = loadLastActiveDate()
     }
 
+    deinit {
+        saveLastActiveDate()
+    }
+    
     /**
      C. variable related methods
     */
@@ -87,18 +105,63 @@ class AccumulatedTimeModel: ObservableObject {
     }
     
     private func updateDailyAccumulatedTime() {
+        checkForDateChange() // Check if the date has changed before updating
+                
         let today = dateFormatter.string(from: Date())
         todayAccumulatedTime += 1
         dailyAccumulatedTimes[today] = todayAccumulatedTime
+        
+        saveDailyAccumulatedTimes() // Save after updating //TODO - 매 초마다 save i/o 하는건 inefficient. needs to be fixed
     }
     
-    //3. 오늘 추가된 시간 초기화
+    
+    
+    //3. 오늘 추가된 시간 관련 메서드
     private func initializeTodayAccumulatedTime() {
         let today = dateFormatter.string(from: Date())
         todayAccumulatedTime = dailyAccumulatedTimes[today] ?? 0
     }
     
-    //4. max & current streaks
+    private func saveAccumulatedTime(for date: Date) {
+        let dateString = dateFormatter.string(from: date)
+        dailyAccumulatedTimes[dateString] = todayAccumulatedTime
+        saveDailyAccumulatedTimes()
+    }
+    
+    private func resetTodayAccumulatedTime() {
+        todayAccumulatedTime = 0
+        initializeTodayAccumulatedTime()
+        objectWillChange.send()
+    }
+    
+    //4. Save last active date changed
+    private func checkForDateChange() {
+        let currentDate = Date()
+        
+        if let lastDate = lastActiveDate {
+            if !calendar.isDate(lastDate, inSameDayAs: currentDate) {
+                // Date has changed, save accumulated time for the last active date
+                saveAccumulatedTime(for: lastDate)
+                resetTodayAccumulatedTime()
+            }
+        }
+        
+        lastActiveDate = currentDate
+        saveLastActiveDate()
+    }
+    
+    private func saveLastActiveDate() {
+        if let lastDate = lastActiveDate {
+            UserDefaults.standard.set(lastDate, forKey: "lastActiveDate")
+        }
+    }
+    
+    // Load last active date
+    private func loadLastActiveDate() -> Date? {
+        return UserDefaults.standard.object(forKey: "lastActiveDate") as? Date
+    }
+    
+    //5. max & current streaks 관련 메서드
     private func saveMaxConsecutiveDays() {
         UserDefaults.standard.set(maxConsecutiveDays, forKey: "maxConsecutiveDays")
     }
