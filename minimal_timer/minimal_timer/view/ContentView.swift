@@ -33,13 +33,13 @@ struct ContentView: View {
             switch activeView {
                 case .minimalTimer:
                     MinimalTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
-                        .frame(width: 100, height: 50)
+                        .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                 case .transparentTimer:
                     TransparentTimerView(timerModel: self.timerModel)
-                        .frame(width: 270, height: 120)
+                        .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
                 case .calendar:
                     CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
-                        .frame(width: 295, height: 380)
+                        .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
                 }
             }
             .onChange(of: scenePhase) { _, newPhase in
@@ -208,28 +208,28 @@ struct ContentView: View {
     }
     
     private func positionWindow(_ window: NSWindow) {
-        let (width, height) = getWindowSize()
-        window.setContentSize(NSSize(width: width, height: height))
+        let size = getWindowSize()
+        window.setContentSize(size)
         
         if let screen = window.screen {
             let screenWidth = screen.visibleFrame.width
             let screenHeight = screen.visibleFrame.height
-            let newOriginX = screenWidth - width - 5
-            let newOriginY = screenHeight - height - 37
+            let newOriginX = screenWidth - size.width - 5
+            let newOriginY = screenHeight - size.height - 37
             window.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
         }
     }
     
-    private func getWindowSize() -> (CGFloat, CGFloat) {
-        switch activeView {
-        case .minimalTimer:
-            return (100, 50)
-        case .transparentTimer:
-            return (270, 120)
-        case .calendar:
-            return (295, 380)
-        }
-    }
+    private func getWindowSize() -> CGSize {
+       switch activeView {
+       case .minimalTimer:
+           return ViewDimensions.minimalTimer.size
+       case .transparentTimer:
+           return ViewDimensions.transparentTimer.size
+       case .calendar:
+           return ViewDimensions.calendar.size
+       }
+   }
     
     private func finalizeInput() {
         if let finalNumber = Int(self.accumulatedNumber) {

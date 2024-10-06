@@ -19,7 +19,7 @@ struct MinimalTimerView: View {
             //2. timer
             Text(timerModel.formatTime(timerModel.timeRemaining))
                 .font(.largeTitle)
-                .frame(width: 100, height: 50)
+                .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                 .background(Color.black)
                 .foregroundColor(.white)
                 .clipShape(Rectangle())

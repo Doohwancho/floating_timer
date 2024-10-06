@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F8662FAD2CAA9E8800A2EBFF /* CalendarWithDailyTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8662FAC2CAA9E8800A2EBFF /* CalendarWithDailyTime.swift */; };
 		F889599A2C4FAF620043ADDC /* AccumulatedTimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88959992C4FAF620043ADDC /* AccumulatedTimeModel.swift */; };
+		F893AD912CB288390065A955 /* ViewDimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F893AD902CB288390065A955 /* ViewDimensions.swift */; };
 		F8AEFC882BF76C4F00E193DF /* TransparentTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC872BF76C4F00E193DF /* TransparentTimerView.swift */; };
 		F8AEFC8A2BF76C6400E193DF /* MinimalTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AEFC892BF76C6400E193DF /* MinimalTimerView.swift */; };
 		F8D9E2ED2BF5C1EA001BF39A /* minimal_timerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		F8662FAC2CAA9E8800A2EBFF /* CalendarWithDailyTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarWithDailyTime.swift; sourceTree = "<group>"; };
 		F88959992C4FAF620043ADDC /* AccumulatedTimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccumulatedTimeModel.swift; sourceTree = "<group>"; };
+		F893AD902CB288390065A955 /* ViewDimensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewDimensions.swift; sourceTree = "<group>"; };
 		F8AEFC872BF76C4F00E193DF /* TransparentTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransparentTimerView.swift; sourceTree = "<group>"; };
 		F8AEFC892BF76C6400E193DF /* MinimalTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalTimerView.swift; sourceTree = "<group>"; };
 		F8D9E2E92BF5C1EA001BF39A /* minimal_timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = minimal_timer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +93,14 @@
 			path = model;
 			sourceTree = "<group>";
 		};
+		F893AD8F2CB288290065A955 /* enum */ = {
+			isa = PBXGroup;
+			children = (
+				F893AD902CB288390065A955 /* ViewDimensions.swift */,
+			);
+			path = enum;
+			sourceTree = "<group>";
+		};
 		F8D9E2E02BF5C1EA001BF39A = {
 			isa = PBXGroup;
 			children = (
@@ -114,6 +124,7 @@
 		F8D9E2EB2BF5C1EA001BF39A /* minimal_timer */ = {
 			isa = PBXGroup;
 			children = (
+				F893AD8F2CB288290065A955 /* enum */,
 				F83226392BF626A000656577 /* model */,
 				F8D9E3202BF62366001BF39A /* view */,
 				F8D9E2EC2BF5C1EA001BF39A /* minimal_timerApp.swift */,
@@ -293,6 +304,7 @@
 				F8D9E2EF2BF5C1EA001BF39A /* ContentView.swift in Sources */,
 				F8662FAD2CAA9E8800A2EBFF /* CalendarWithDailyTime.swift in Sources */,
 				F8AEFC882BF76C4F00E193DF /* TransparentTimerView.swift in Sources */,
+				F893AD912CB288390065A955 /* ViewDimensions.swift in Sources */,
 				F8D9E31F2BF62298001BF39A /* TimerModel.swift in Sources */,
 				F889599A2C4FAF620043ADDC /* AccumulatedTimeModel.swift in Sources */,
 				F8AEFC8A2BF76C6400E193DF /* MinimalTimerView.swift in Sources */,

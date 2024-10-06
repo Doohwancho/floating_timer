@@ -81,7 +81,7 @@ struct TransparentTimerView: View {
                     .padding(.trailing)
             }
         }
-        .frame(width: 270, height: 120)
+        .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
         .background(Color(white:0.95))
     }
 }

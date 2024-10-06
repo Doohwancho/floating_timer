@@ -63,7 +63,7 @@ struct CalendarWithDailyTimeView: View {
                 }
             }
         }
-        .frame(width: 295, height: 380)
+        .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
         .background(Color(white:0.983))
     }
     
