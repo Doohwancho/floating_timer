@@ -135,7 +135,7 @@ class AccumulatedTimeModel: ObservableObject {
     }
     
     //4. Save last active date changed
-    private func checkForDateChange() {
+    func checkForDateChange() {
         let currentDate = Date()
         
         if let lastDate = lastActiveDate {

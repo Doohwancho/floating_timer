@@ -58,6 +58,7 @@ struct ContentView: View {
                         switch event.keyCode {
                             case 18: // Command + 1
                                 activeView = .minimalTimer
+                                accumulatedTimeModel.checkForDateChange()
                                 DispatchQueue.main.async {
                                     if let window = NSApplication.shared.windows.first {
                                         configureWindow(window)
@@ -66,6 +67,7 @@ struct ContentView: View {
                                 return nil
                             case 19: // Command + 2
                                 activeView = .transparentTimer
+                                accumulatedTimeModel.checkForDateChange()
                                 DispatchQueue.main.async {
                                     if let window = NSApplication.shared.windows.first {
                                         configureWindow(window)
@@ -74,6 +76,7 @@ struct ContentView: View {
                                 return nil
                             case 20: // Command + 3
                                 activeView = .calendar
+                                accumulatedTimeModel.checkForDateChange()
                                 DispatchQueue.main.async {
                                     if let window = NSApplication.shared.windows.first {
                                         configureWindow(window)
