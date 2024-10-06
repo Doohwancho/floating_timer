@@ -47,7 +47,7 @@ struct CalendarWithDailyTimeView: View {
             }
             .padding()
             
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(31)), count: 7), spacing: 8) {
                 ForEach(weekdaySymbols, id: \.self) { symbol in
                     Text(symbol)
                         .font(.caption)
@@ -63,7 +63,8 @@ struct CalendarWithDailyTimeView: View {
                 }
             }
         }
-        .frame(width: 300, height: 300)
+        .frame(width: 295, height: 380)
+        .background(Color(white:0.983))
     }
     
     private func days() -> [Date] {
@@ -148,8 +149,8 @@ struct DayView: View {
                 Text(formattedTime)
                     .font(.system(size: 10))
             }
-            .frame(height: 40)
-            .frame(maxWidth: .infinity)
+            .frame(width: 33, height: 40)
+//            .frame(maxWidth: .infinity)
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)

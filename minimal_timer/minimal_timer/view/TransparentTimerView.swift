@@ -14,7 +14,7 @@ struct TransparentTimerView: View {
                     HStack(spacing: 1) {
                         ForEach(0..<121) { index in
                             Rectangle()
-                                .fill(timerModel.getTimeIndexInMinutes() == index ? Color.black : Color(white: 0.95))
+                                .fill(timerModel.getTimeIndexInMinutes() == index ? Color.black : Color(white: 0.88))
                                 .frame(width: 1, height: 20)
                                 .onTapGesture {
                                     timerModel.setTimer(with: index) //TODO: vertical bar 사이 공간 클릭하면 인식 못하는 문제 해결 필요 
@@ -81,6 +81,7 @@ struct TransparentTimerView: View {
                     .padding(.trailing)
             }
         }
-        .frame(width: 250, height: 100) 
+        .frame(width: 270, height: 120)
+        .background(Color(white:0.95))
     }
 }
