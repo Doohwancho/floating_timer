@@ -42,7 +42,14 @@ class AccumulatedTimeModel: ObservableObject {
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다.
+        return formatter
+    }()
+    
+    private let dateFormatter_detailed: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다.
         return formatter
     }()
     
@@ -177,8 +184,28 @@ class AccumulatedTimeModel: ObservableObject {
     
     private func updateDailyAccumulatedTime() {
         checkForDateChange() // Check if the date has changed before updating
-                
-        let today = dateFormatter.string(from: getCurrentDate())
+        
+        /**
+         실험: Date()랑 Date()에 GMT 시간 더한것 타임존에 맞는지 비교하기 + dateFormatter에 넣으면 시간이 바뀐다?
+        //결론:
+        //YYYY-MM-DD 쓸꺼면 dateFormmater.string(from: Date())가 맞다.
+        //YYYY-MM-DD HH:mm:ss 쓸꺼면 getCurrentTime()가 맞다.
+        
+        print("Date()")
+        print(Date()) //2024-10-09 10:10:01 +0000  right date, wrong time
+        print("Date() not detailed")
+        print(dateFormatter.string(from: Date())) //2024-10-09 right date?
+        print("Date() detailed")
+        print(dateFormatter_detailed.string(from: Date())) //2024-10-09T19:10:01   right date, right time
+        print("getCurrentDate()")
+        print(getCurrentDate()) //2024-10-09 18:42:40 +0000 right date, time
+        print("getCurrentDate() not detailed")
+        print(dateFormatter.string(from: getCurrentDate())) //wrong date, time
+        print("getCurrentDate() detailed")
+        print(dateFormatter_detailed.string(from: getCurrentDate())) //wrong date and time
+         */
+        
+        let today = dateFormatter.string(from: Date())
         todayAccumulatedTime += 1
         dailyAccumulatedTimes[today] = todayAccumulatedTime
         
