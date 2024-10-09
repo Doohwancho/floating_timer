@@ -103,6 +103,9 @@ class AccumulatedTimeModel: ObservableObject {
         //이렇게 데이터가 저장됨
 //        "dailyAccumulatedTimes" => {length = 178, bytes = 0x7b223230 32342d31 302d3037 223a3732 ... 223a3133 3732327d }
         
+        //Q. how to see data?
+        //plutil -p /Users/cho-cho/Library/Containers/com.cho.minimal-timer/Data/Library/Preferences/com.cho.minimal-timer.plist
+        
         //Q. why encode when save?
         //1. Compatibility: UserDefaults is designed to store property list types (String, Number, Date, Data, Array, or Dictionary). A complex dictionary like [String: Int] is not directly supported, so it needs to be converted to Data.
         //2. Efficiency: Encoding to Data can be more efficient for storage and retrieval, especially for larger datasets.
@@ -134,11 +137,42 @@ class AccumulatedTimeModel: ObservableObject {
 //            }
 //        }
         
+        // 잘못된 데이터 삭제
+//        removeData(for: "2024-10-10")
+
+        // 10월 8일 데이터 수동 입력 (예: 3600초 = 1시간)
+//        setData(for: "2024-10-01", seconds: 484)
+//        setData(for: "2024-10-02", seconds: 5967)
+//        setData(for: "2024-10-03", seconds: 7748)
+//        setData(for: "2024-10-04", seconds: 5462)
+//        setData(for: "2024-10-05", seconds: 1338)
+//        setData(for: "2024-10-06", seconds: 13722)
+//        setData(for: "2024-10-07", seconds: 7200)
+//        setData(for: "2024-10-08", seconds: 8000)
+//        setData(for: "2024-10-09", seconds: 4089)
+
+        
         //방법2) encode 안한걸 로드하기
         //장점) debugging 하기 용이하다. + 나중에 사고나서 데이터 백업해야 할 때에도 정확히 몇일에 몇초 저장했는지 눈으로 볼 수 있어야 용이하다.
         if let loadedTimes = UserDefaults.standard.dictionary(forKey: "dailyAccumulatedTimes_ver2_raw_format") as? [String: Int] {
             dailyAccumulatedTimes = loadedTimes
         }
+    }
+    
+    /**
+        Debug purpose code
+        가끔 dailyAccumulatedTime에 값이 추가로 잘못 저장되서 지워야 할 때, 저장되어야 했을 값이 저장이 안됬을 때 수동으로 값을 입력해주는 코드
+     */
+    // 특정 날짜의 데이터를 삭제하는 메소드
+    func removeData(for date: String) {
+        dailyAccumulatedTimes.removeValue(forKey: date)
+        saveDailyAccumulatedTimes()
+    }
+
+    // 특정 날짜에 데이터를 수동으로 입력하는 메소드
+    func setData(for date: String, seconds: Int) {
+        dailyAccumulatedTimes[date] = seconds
+        saveDailyAccumulatedTimes()
     }
     
     private func updateDailyAccumulatedTime() {
