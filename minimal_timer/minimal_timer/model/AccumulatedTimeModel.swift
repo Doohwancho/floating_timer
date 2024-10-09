@@ -5,6 +5,9 @@ class AccumulatedTimeModel: ObservableObject {
     /**
      A. variables
     */
+    //0. timezone = asia/seoul
+    private let timeZone = TimeZone(identifier: "Asia/Seoul")!
+    
     //1. 총 기록한 시간 저장 & 로드
     @Published private var totalAccumulatedTime: Int = 0 {
         didSet {
@@ -29,10 +32,17 @@ class AccumulatedTimeModel: ObservableObject {
     
     //3. 오늘 추가된 시간
     @Published private(set) var todayAccumulatedTime: Int = 0
-    private let calendar = Calendar.current
+    
+    private let calendar: Calendar = {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+        return calendar
+    }()
+    
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
@@ -66,7 +76,7 @@ class AccumulatedTimeModel: ObservableObject {
         initializeTodayAccumulatedTime()
         loadMaxConsecutiveDays()
         calculateCurrentStreak()
-        lastActiveDate = loadLastActiveDate() ?? Date()
+        lastActiveDate = loadLastActiveDate() ?? getCurrentDate()
     }
 
     deinit {
@@ -107,7 +117,7 @@ class AccumulatedTimeModel: ObservableObject {
     private func updateDailyAccumulatedTime() {
         checkForDateChange() // Check if the date has changed before updating
                 
-        let today = dateFormatter.string(from: Date())
+        let today = dateFormatter.string(from: getCurrentDate())
         todayAccumulatedTime += 1
         dailyAccumulatedTimes[today] = todayAccumulatedTime
         
@@ -136,7 +146,7 @@ class AccumulatedTimeModel: ObservableObject {
     
     //4. Save last active date changed
     func checkForDateChange() {
-        let currentDate = Date()
+        let currentDate = getCurrentDate()
         
         if let lastDate = lastActiveDate {
             if !calendar.isDate(lastDate, inSameDayAs: currentDate) {
@@ -156,7 +166,12 @@ class AccumulatedTimeModel: ObservableObject {
     
     // Load last active date
     private func loadLastActiveDate() -> Date? {
-        return UserDefaults.standard.object(forKey: "lastActiveDate") as? Date
+        if let date = UserDefaults.standard.object(forKey: "lastActiveDate") as? Date {
+            // Ensure the loaded date is interpreted in the correct timezone
+            let components = calendar.dateComponents(in: timeZone, from: date)
+            return calendar.date(from: components)
+        }
+        return nil
     }
     
     //5. max & current streaks 관련 메서드
@@ -171,7 +186,7 @@ class AccumulatedTimeModel: ObservableObject {
     private func calculateCurrentStreak() {
         let sortedDates = dailyAccumulatedTimes.keys.sorted(by: >)
         var streak = 0
-        var currentDate = calendar.startOfDay(for: Date())
+        var currentDate = calendar.startOfDay(for: getCurrentDate())
 
         for dateString in sortedDates {
             if let date = dateFormatter.date(from: dateString),
@@ -204,6 +219,11 @@ class AccumulatedTimeModel: ObservableObject {
     /**
      D. getters
     */
+    // Helper method to get current date in Seoul timezone
+    private func getCurrentDate() -> Date {
+        return Date().addingTimeInterval(TimeInterval(timeZone.secondsFromGMT()))
+    }
+    
     func getTotalAccumulatedTime() -> String {
         return formatAccumulatedTime(totalAccumulatedTime)
     }

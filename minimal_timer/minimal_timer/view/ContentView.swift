@@ -18,7 +18,7 @@ struct ContentView: View {
     @State private var isInsertMode = false
     private let MAX_CHAR_LIMIT = 14
     @State private var inputText = ""
-    @State private var currentDate = Date()
+    @State private var currentDate = Date().addingTimeInterval(TimeInterval(TimeZone(identifier: "Asia/Seoul")!.secondsFromGMT()))
     
     // Korean to English mapping
     let koreanToEnglish: [Character: Character] = [
