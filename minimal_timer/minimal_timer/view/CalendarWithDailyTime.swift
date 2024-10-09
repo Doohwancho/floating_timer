@@ -58,7 +58,7 @@ struct CalendarWithDailyTimeView: View {
                 }
                 ForEach(days(), id: \.self) { date in
                     DayView(date: date, 
-                            isSelected: calendar.isDate(date, inSameDayAs: selectedDate ?? accumulatedTimeModel.getCurrentDate()),
+                            isSelected: calendar.isDate(date, inSameDayAs: selectedDate ?? Date()),
                             accumulatedSeconds: accumulatedTimeForDate(date))
                         .onTapGesture {
                             selectedDate = date
