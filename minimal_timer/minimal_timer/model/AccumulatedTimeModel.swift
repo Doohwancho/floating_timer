@@ -66,7 +66,7 @@ class AccumulatedTimeModel: ObservableObject {
         initializeTodayAccumulatedTime()
         loadMaxConsecutiveDays()
         calculateCurrentStreak()
-        lastActiveDate = loadLastActiveDate()
+        lastActiveDate = loadLastActiveDate() ?? Date()
     }
 
     deinit {
@@ -151,9 +151,7 @@ class AccumulatedTimeModel: ObservableObject {
     }
     
     private func saveLastActiveDate() {
-        if let lastDate = lastActiveDate {
-            UserDefaults.standard.set(lastDate, forKey: "lastActiveDate")
-        }
+        UserDefaults.standard.set(lastActiveDate, forKey: "lastActiveDate")
     }
     
     // Load last active date
