@@ -7,6 +7,7 @@ struct CalendarWithDailyTimeView: View {
     
     private let calendar: Calendar = {
         var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
         calendar.firstWeekday = 2 // 2 represents Monday
         return calendar
     }()
@@ -14,12 +15,14 @@ struct CalendarWithDailyTimeView: View {
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
     private let monthYearFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
@@ -55,7 +58,7 @@ struct CalendarWithDailyTimeView: View {
                 }
                 ForEach(days(), id: \.self) { date in
                     DayView(date: date, 
-                            isSelected: Calendar.current.isDate(date, inSameDayAs: selectedDate ?? Date()),
+                            isSelected: calendar.isDate(date, inSameDayAs: selectedDate ?? accumulatedTimeModel.getCurrentDate()),
                             accumulatedSeconds: accumulatedTimeForDate(date))
                         .onTapGesture {
                             selectedDate = date
@@ -104,7 +107,7 @@ struct CalendarWithDailyTimeView: View {
     
     private func accumulatedTimeForDate(_ date: Date) -> Int {
         let dateString = dateFormatter.string(from: date)
-        if Calendar.current.isDateInToday(date) {
+        if calendar.isDateInToday(date) {
             return accumulatedTimeModel.todayAccumulatedTime
         }
         return accumulatedTimeModel.getDailyAccumulatedTimes()[dateString] ?? 0

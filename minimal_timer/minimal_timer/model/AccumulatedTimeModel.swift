@@ -99,18 +99,45 @@ class AccumulatedTimeModel: ObservableObject {
     
     //2. 일일별 기록한 시간 저장 & 로드 & 업데이트
     private func saveDailyAccumulatedTimes() {
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(dailyAccumulatedTimes) {
-            UserDefaults.standard.set(encoded, forKey: "dailyAccumulatedTimes")
-        }
+        //방법1) encode 하고 저장하기
+        //이렇게 데이터가 저장됨
+//        "dailyAccumulatedTimes" => {length = 178, bytes = 0x7b223230 32342d31 302d3037 223a3732 ... 223a3133 3732327d }
+        
+        //Q. why encode when save?
+        //1. Compatibility: UserDefaults is designed to store property list types (String, Number, Date, Data, Array, or Dictionary). A complex dictionary like [String: Int] is not directly supported, so it needs to be converted to Data.
+        //2. Efficiency: Encoding to Data can be more efficient for storage and retrieval, especially for larger datasets.
+
+//        let encoder = JSONEncoder()
+//        if let encoded = try? encoder.encode(dailyAccumulatedTimes) {
+//            UserDefaults.standard.set(encoded, forKey: "dailyAccumulatedTimes_ver1")
+//        }
+//        
+        
+        //방법2) encode 안하고 그냥 저장하기
+        //이렇게 데이터가 저장됨
+//        "dailyAccumulatedTimes" => {
+//            "2024-10-07" = 72;
+//            "2024-10-08" = 13722;
+//            // ... other dates
+//        }
+        //장점) debugging 하기 용이하다. + 나중에 사고나서 데이터 백업해야 할 때에도 정확히 몇일에 몇초 저장했는지 눈으로 볼 수 있어야 용이하다.
+        UserDefaults.standard.set(dailyAccumulatedTimes, forKey: "dailyAccumulatedTimes_ver2_raw_format")
     }
 
     private func loadDailyAccumulatedTimes() {
-        if let savedDailyTimes = UserDefaults.standard.data(forKey: "dailyAccumulatedTimes") {
-            let decoder = JSONDecoder()
-            if let loadedDailyTimes = try? decoder.decode([String: Int].self, from: savedDailyTimes) {
-                dailyAccumulatedTimes = loadedDailyTimes
-            }
+//        //방법1) encode 하고 저장한걸 로드하기
+//        if let savedDailyTimes = UserDefaults.standard.data(forKey: "dailyAccumulatedTimes") {
+//            let decoder = JSONDecoder()
+//            if let loadedDailyTimes = try? decoder.decode([String: Int].self, from: savedDailyTimes) {
+//                UserDefaults.standard.set(loadedDailyTimes, forKey: "dailyAccumulatedTimes_ver1")
+//                dailyAccumulatedTimes = loadedDailyTimes
+//            }
+//        }
+        
+        //방법2) encode 안한걸 로드하기
+        //장점) debugging 하기 용이하다. + 나중에 사고나서 데이터 백업해야 할 때에도 정확히 몇일에 몇초 저장했는지 눈으로 볼 수 있어야 용이하다.
+        if let loadedTimes = UserDefaults.standard.dictionary(forKey: "dailyAccumulatedTimes_ver2_raw_format") as? [String: Int] {
+            dailyAccumulatedTimes = loadedTimes
         }
     }
     
@@ -220,7 +247,7 @@ class AccumulatedTimeModel: ObservableObject {
      D. getters
     */
     // Helper method to get current date in Seoul timezone
-    private func getCurrentDate() -> Date {
+    func getCurrentDate() -> Date {
         return Date().addingTimeInterval(TimeInterval(timeZone.secondsFromGMT()))
     }
     
