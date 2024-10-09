@@ -42,14 +42,14 @@ class AccumulatedTimeModel: ObservableObject {
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다.
+//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다. 아마 default_timezone 설정해서 그런듯?
         return formatter
     }()
     
     private let dateFormatter_detailed: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다.
+//        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") //쓰고 안쓰고 차이가 없었다. 아마 default_timezone 설정해서 그런듯?
         return formatter
     }()
     
@@ -187,7 +187,11 @@ class AccumulatedTimeModel: ObservableObject {
         
         /**
          실험: Date()랑 Date()에 GMT 시간 더한것 타임존에 맞는지 비교하기 + dateFormatter에 넣으면 시간이 바뀐다?
-        //결론:
+        
+        //결론: 그냥 Date() 쓰면 타임존 안맞는데, dateFormatter() 씌우면 맞는 듯?
+        //근데 dateFormatter_detailed.string(from: Date())) 은 타입이 string이니까,
+        //현재 시각이 필요한데 Date 타입이 필요하면 getCurrentTime() 쓰자.
+         
         //YYYY-MM-DD 쓸꺼면 dateFormmater.string(from: Date())가 맞다.
         //YYYY-MM-DD HH:mm:ss 쓸꺼면 getCurrentTime()가 맞다.
         
@@ -274,7 +278,7 @@ class AccumulatedTimeModel: ObservableObject {
     private func calculateCurrentStreak() {
         let sortedDates = dailyAccumulatedTimes.keys.sorted(by: >)
         var streak = 0
-        var currentDate = calendar.startOfDay(for: getCurrentDate())
+        var currentDate = calendar.startOfDay(for: Date()) //calendar은 Date의 타임존이 맞는 듯 하다. 
 
         for dateString in sortedDates {
             if let date = dateFormatter.date(from: dateString),
