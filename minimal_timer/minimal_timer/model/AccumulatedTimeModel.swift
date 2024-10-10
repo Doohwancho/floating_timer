@@ -135,15 +135,6 @@ class AccumulatedTimeModel: ObservableObject {
     }
 
     private func loadDailyAccumulatedTimes() {
-//        //방법1) encode 하고 저장한걸 로드하기
-//        if let savedDailyTimes = UserDefaults.standard.data(forKey: "dailyAccumulatedTimes") {
-//            let decoder = JSONDecoder()
-//            if let loadedDailyTimes = try? decoder.decode([String: Int].self, from: savedDailyTimes) {
-//                UserDefaults.standard.set(loadedDailyTimes, forKey: "dailyAccumulatedTimes_ver1")
-//                dailyAccumulatedTimes = loadedDailyTimes
-//            }
-//        }
-        
         // 잘못된 데이터 삭제
 //        removeData(for: "2024-10-10")
 
@@ -157,7 +148,17 @@ class AccumulatedTimeModel: ObservableObject {
 //        setData(for: "2024-10-07", seconds: 7200)
 //        setData(for: "2024-10-08", seconds: 8000)
 //        setData(for: "2024-10-09", seconds: 4089)
-
+//        setData(for: "2024-10-10", seconds: 3600)
+        
+        
+//        //방법1) encode 하고 저장한걸 로드하기
+//        if let savedDailyTimes = UserDefaults.standard.data(forKey: "dailyAccumulatedTimes") {
+//            let decoder = JSONDecoder()
+//            if let loadedDailyTimes = try? decoder.decode([String: Int].self, from: savedDailyTimes) {
+//                UserDefaults.standard.set(loadedDailyTimes, forKey: "dailyAccumulatedTimes_ver1")
+//                dailyAccumulatedTimes = loadedDailyTimes
+//            }
+//        }
         
         //방법2) encode 안한걸 로드하기
         //장점) debugging 하기 용이하다. + 나중에 사고나서 데이터 백업해야 할 때에도 정확히 몇일에 몇초 저장했는지 눈으로 볼 수 있어야 용이하다.
@@ -232,8 +233,9 @@ class AccumulatedTimeModel: ObservableObject {
     
     private func resetTodayAccumulatedTime() {
         todayAccumulatedTime = 0
-        initializeTodayAccumulatedTime()
-        objectWillChange.send()
+        let today = dateFormatter.string(from: Date())
+        dailyAccumulatedTimes[today] = 0
+        objectWillChange.send() //SwiftUI한테 object가 바뀔거야 알려줘서 @ObservedObject or @StateObject 달려 있는 변수 re-render한다.
     }
     
     //4. Save last active date changed
