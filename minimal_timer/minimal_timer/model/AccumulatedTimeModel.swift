@@ -149,6 +149,8 @@ class AccumulatedTimeModel: ObservableObject {
 //        setData(for: "2024-10-08", seconds: 8000)
 //        setData(for: "2024-10-09", seconds: 4089)
 //        setData(for: "2024-10-10", seconds: 3600)
+//        setData(for: "2024-10-11", seconds: 0)
+//        setData(for: "2024-10-12", seconds: 0)
         
         
 //        //방법1) encode 하고 저장한걸 로드하기
@@ -285,7 +287,7 @@ class AccumulatedTimeModel: ObservableObject {
         for dateString in sortedDates {
             if let date = dateFormatter.date(from: dateString),
                let dayDifference = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: currentDate).day {
-                if dayDifference <= streak {
+                if dayDifference <= streak && dailyAccumulatedTimes[dateString]! > 0{
                     streak += 1
                     currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate)!
                 } else {
