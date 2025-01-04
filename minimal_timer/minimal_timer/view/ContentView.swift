@@ -32,14 +32,27 @@ struct ContentView: View {
         Group {
             switch activeView {
                 case .minimalTimer:
+                if timerModel.showResult {
+                    ResultView(timerModel: timerModel)
+                        .frame(width: ViewDimensions.minimalTimerWithResult.size.width,
+                               height: ViewDimensions.minimalTimerWithResult.size.height)
+                } else {
                     MinimalTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
                         .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
+                }
                 case .transparentTimer:
                     TransparentTimerView(timerModel: self.timerModel)
                         .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
                 case .calendar:
                     CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
                         .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
+                }
+            }
+            .onChange(of: timerModel.showResult) { _, _ in
+                DispatchQueue.main.async {
+                    if let window = NSApplication.shared.windows.first {
+                        configureWindow(window)
+                    }
                 }
             }
             .onChange(of: scenePhase) { _, newPhase in
@@ -144,16 +157,29 @@ struct ContentView: View {
                     }
                     
                     if event.keyCode == 49 { // Spacebar
-                        if self.timerModel.isRunning {
-                            self.timerModel.pauseTimer()
+                        // If we're showing results, reset to timer view
+                        if self.timerModel.showResult {
+                            self.timerModel.showResult = false
+                            self.timerModel.isGameMode = false
+                            // Reset to default timer state or keep last time
+                            self.timerModel.timeRemaining = 600 // default time
+                        }
+                        else if self.timerModel.isRunning {
+                            // Stop timer (either game mode or normal mode)
+                            if self.timerModel.isGameMode {
+                                self.timerModel.stopGameMode()
+                            } else {
+                                self.timerModel.pauseTimer()
+                            }
                         } else {
-                            self.timerModel.startTimerDecrease()
+                            // Start game mode
+                            self.timerModel.startGameMode()
                         }
                         return nil
                     }
                     
                     // Handle number input
-                    if !event.modifierFlags.contains(.command) {
+                    if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
                         if let characters = event.characters {
                             for character in characters {
                                 if character.isNumber {
@@ -214,8 +240,11 @@ struct ContentView: View {
         if let screen = window.screen {
             let screenWidth = screen.visibleFrame.width
             let screenHeight = screen.visibleFrame.height
+            
+            // Calculate position to maintain the same top-right corner
             let newOriginX = screenWidth - size.width - 5
             let newOriginY = screenHeight - size.height - 37
+            
             window.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
         }
     }
@@ -223,7 +252,9 @@ struct ContentView: View {
     private func getWindowSize() -> CGSize {
        switch activeView {
        case .minimalTimer:
-           return ViewDimensions.minimalTimer.size
+               return timerModel.showResult ?
+                   ViewDimensions.minimalTimerWithResult.size :
+                   ViewDimensions.minimalTimer.size
        case .transparentTimer:
            return ViewDimensions.transparentTimer.size
        case .calendar:

@@ -151,6 +151,8 @@ class AccumulatedTimeModel: ObservableObject {
 //        setData(for: "2024-10-10", seconds: 3600)
 //        setData(for: "2024-10-11", seconds: 0)
 //        setData(for: "2024-10-12", seconds: 7200)
+//        setData(for: "2024-10-13", seconds: 900)
+//        setData(for: "2024-10-14", seconds: 7200)
         
         
 //        //방법1) encode 하고 저장한걸 로드하기
