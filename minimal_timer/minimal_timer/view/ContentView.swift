@@ -11,6 +11,7 @@ struct ContentView: View {
         case minimalTimer
         case transparentTimer
         case calendar
+//        case todoList
     }
     @State private var activeView: ActiveView = .minimalTimer
     
@@ -19,6 +20,7 @@ struct ContentView: View {
     private let MAX_CHAR_LIMIT = 14
     @State private var inputText = ""
     @State private var currentDate = Date().addingTimeInterval(TimeInterval(TimeZone(identifier: "Asia/Seoul")!.secondsFromGMT()))
+    
     
     // Korean to English mapping
     let koreanToEnglish: [Character: Character] = [
@@ -46,6 +48,10 @@ struct ContentView: View {
                 case .calendar:
                     CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
                         .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
+//                case .todoList:
+//                    TodoListView(activeView: $activeView)
+//                        .frame(width: ViewDimensions.minimalTimer.size.width,
+//                               height: ViewDimensions.minimalTimer.size.height)
                 }
             }
             .onChange(of: timerModel.showResult) { _, _ in
@@ -69,6 +75,35 @@ struct ContentView: View {
                     
                     if event.modifierFlags.contains(.command) {
                         switch event.keyCode {
+//                            case 50: // Command + `
+//                                activeView = .todoList
+//                                DispatchQueue.main.async {
+//                                    if let window = NSApplication.shared.windows.first {
+//                                        configureWindow(window)
+//                                    }
+//                                }
+//                            case 36: // Command + Return
+//                                if activeView == .todoList,
+//                                   let selectedTodo = TodoListState.shared.selectedTodo {
+//                                    activeView = .minimalTimer
+//                                    inputText = selectedTodo.text
+//                                    DispatchQueue.main.async {
+//                                        if let window = NSApplication.shared.windows.first {
+//                                            configureWindow(window)
+//                                        }
+//                                    }
+//                                }
+//                            case 51: // Command + Delete
+//                                if activeView == .todoList,
+//                                   let selectedIndex = TodoListState.shared.selectedIndex {
+//                                    TodoListState.shared.todos.remove(at: selectedIndex)
+//                                    if TodoListState.shared.todos.isEmpty {
+//                                        TodoListState.shared.selectedIndex = nil
+//                                    } else {
+//                                        TodoListState.shared.selectedIndex = min(selectedIndex, TodoListState.shared.todos.count - 1)
+//                                    }
+//                                }
+//                                return nil
                             case 18: // Command + 1
                                 activeView = .minimalTimer
                                 accumulatedTimeModel.checkForDateChange()
@@ -124,36 +159,38 @@ struct ContentView: View {
                         }
                     }
                     
-                    if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
-                        isInsertMode = true
-                        return nil
-                    } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                        if isInsertMode {
-                            isInsertMode = false
-                        }
-                        return nil
-                    }
-                    
-                    if isInsertMode {
-                        if event.keyCode == 51 { // Backspace key
-                            if event.modifierFlags.contains(.command) {
-                                // Command + Backspace: clear all text
-                                inputText = ""
-                            } else if event.modifierFlags.contains(.option) {
-                                // Option + Backspace: delete last word
-                                inputText = deleteLastWord(from: inputText)
-                            } else if !inputText.isEmpty {
-                                // Regular Backspace: remove last character
-                                inputText.removeLast()
+                    if activeView == .minimalTimer {
+                        if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
+                            isInsertMode = true
+                            return nil
+                        } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
+                            if isInsertMode {
+                                isInsertMode = false
                             }
-                        } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
-                            let mappedChar = mapKoreanToEnglish(inputChar)
-                            inputText += String(mappedChar)
-                        } else {
-                            // Add feedback when limit is reached
-                            NSSound.beep()
+                            return nil
                         }
-                        return nil
+                        
+                        if isInsertMode {
+                            if event.keyCode == 51 { // Backspace key
+                                if event.modifierFlags.contains(.command) {
+                                    // Command + Backspace: clear all text
+                                    inputText = ""
+                                } else if event.modifierFlags.contains(.option) {
+                                    // Option + Backspace: delete last word
+                                    inputText = deleteLastWord(from: inputText)
+                                } else if !inputText.isEmpty {
+                                    // Regular Backspace: remove last character
+                                    inputText.removeLast()
+                                }
+                            } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
+                                let mappedChar = mapKoreanToEnglish(inputChar)
+                                inputText += String(mappedChar)
+                            } else {
+                                // Add feedback when limit is reached
+                                NSSound.beep()
+                            }
+                            return nil
+                        }
                     }
                     
                     if event.keyCode == 49 { // Spacebar
@@ -259,6 +296,8 @@ struct ContentView: View {
            return ViewDimensions.transparentTimer.size
        case .calendar:
            return ViewDimensions.calendar.size
+//       case .todoList:
+//           return ViewDimensions.todoList.size
        }
    }
     
