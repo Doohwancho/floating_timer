@@ -4,6 +4,7 @@ import AppKit
 struct TodoListView: View {
     @StateObject private var todoState = TodoListState.shared
     @State private var isInsertMode = false
+    @State private var isEditMode = false
     @State private var todoText = ""
     @Binding var activeView: ContentView.ActiveView
     @Binding var shouldResizeWindow: Bool
@@ -16,9 +17,8 @@ struct TodoListView: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            if isInsertMode {
-                TextField("New TODO", text: $todoText)
-//                    .textFieldStyle(PlainTextFieldStyle())
+            if isInsertMode || isEditMode {
+                TextField(isEditMode ? "Edit TODO" : "New TODO", text: $todoText)
                     .textFieldStyle(.plain)
                     .focused($isFocused)
                     .padding(8)
@@ -29,7 +29,11 @@ struct TodoListView: View {
                     .padding(.horizontal)
                     .foregroundColor(.white) //text color
                     .onSubmit {
-                        handleTodoSubmit()
+                        if isEditMode {
+                            handleTodoEdit()
+                        } else {
+                            handleTodoSubmit()
+                        }
                     }
                     .onAppear {
                         NSApp.activate(ignoringOtherApps: true)
@@ -39,27 +43,25 @@ struct TodoListView: View {
 //                        isFocused = false
 //                        todoText = ""
 //                    }
-            }
-            
-            if !isInsertMode && todoState.todos.isEmpty {
+            } else if !isInsertMode && todoState.todos.isEmpty {
                 // Show placeholder when no todos and not in insert mode
                 Text("Press 'i' to add todo")
                     .foregroundColor(.gray)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 8)
-            }
-            
-            ScrollView {
-                VStack(spacing: 8) {
-                    ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
-                        Text(todo.text)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(8)
-                            .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
-                            .cornerRadius(8)
+            } else {
+                ScrollView {
+                    VStack(spacing: 8) {
+                        ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
+                            Text(todo.text)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(8)
+                                .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
+                                .cornerRadius(8)
+                        }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             }
         }
         .frame(width: currentSize.width, height: currentSize.height, alignment: .top)
@@ -91,6 +93,15 @@ struct TodoListView: View {
         }
     }
     
+    private func handleTodoEdit() {
+        if !todoText.isEmpty, let selectedIndex = todoState.selectedIndex {
+            todoState.todos[selectedIndex] = TodoItem(text: todoText)
+            todoText = ""
+        }
+        isEditMode = false
+        isFocused = false
+    }
+    
     private func handleTodoSubmit() {
         if !todoText.isEmpty {
             todoState.todos.append(TodoItem(text: todoText))
@@ -112,22 +123,27 @@ struct TodoListView: View {
             guard activeView == .todoList else { return event }
 
             //when is not insert mode
-            if !isInsertMode {
+            if !isInsertMode && !isEditMode {
                 if handleNonInsertModeKeys(event) {
                     return nil
                 }
             }
 
             //when insert mode
-            if isInsertMode {
+            if isInsertMode || isEditMode {
                 if event.keyCode == 53 { // Escape key
                     isInsertMode = false
+                    isEditMode = false
                     isFocused = false
                     todoText = ""
                     return nil
                 }
                 else if event.keyCode == 36 { // Enter key (return)
-                    handleTodoSubmit()
+                    if isEditMode {
+                        handleTodoEdit()
+                    } else {
+                        handleTodoSubmit()
+                    }
                     return nil
                 }
                 return event
@@ -148,8 +164,18 @@ struct TodoListView: View {
         switch event.keyCode {
         case 34: // 'i' key
             isInsertMode = true
+            isEditMode = false
             isFocused = true
             return true
+        case 36: // Enter key
+            if let selectedIndex = todoState.selectedIndex {
+                isEditMode = true
+                isInsertMode = false
+                todoText = todoState.todos[selectedIndex].text  // Pre-fill with existing text
+                isFocused = true
+                return true
+            }
+            return false
         case 38: // 'j' key
             if !todoState.todos.isEmpty {
                 todoState.selectedIndex = min((todoState.selectedIndex ?? -1) + 1, todoState.todos.count - 1)
@@ -161,8 +187,9 @@ struct TodoListView: View {
             }
             return true
         case 53: // Escape key
-            if isInsertMode {
+            if isInsertMode || isEditMode {
                 isInsertMode = false
+                isEditMode = false
                 isFocused = false
                 todoText = ""
                 return true
