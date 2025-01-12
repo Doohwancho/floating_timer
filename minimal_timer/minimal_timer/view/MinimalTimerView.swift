@@ -8,19 +8,12 @@ struct MinimalTimerView: View {
     @Binding var activeView: ContentView.ActiveView
     
     @Binding var inputText: String
+    @FocusState private var isFocused: Bool
     @State private var isInsertMode = false
     private let MAX_CHAR_LIMIT = 14
     
     @State private var accumulatedNumber: String = ""
-    
-    // Korean to English mapping
-    let koreanToEnglish: [Character: Character] = [
-        "ㅁ": "a", "ㅠ": "b", "ㅊ": "c", "ㅇ": "d", "ㄷ": "e", "ㄹ": "f", "ㅎ": "g",
-        "ㅗ": "h", "ㅑ": "i", "ㅓ": "j", "ㅏ": "k", "ㅣ": "l", "ㅡ": "m", "ㅜ": "n",
-        "ㅐ": "o", "ㅔ": "p", "ㅂ": "q", "ㄱ": "r", "ㄴ": "s", "ㅅ": "t", "ㅕ": "u",
-        "ㅍ": "v", "ㅈ": "w", "ㅌ": "x", "ㅛ": "y", "ㅋ": "z"
-    ]
-    
+
     
     private var currentDimensions: ViewDimensions {
         timerModel.showResult ? .minimalTimerWithResult : .minimalTimer
@@ -30,14 +23,37 @@ struct MinimalTimerView: View {
         ZStack{
             //1. 할일 적기 (pressing 'i' as insert mode)
             if !timerModel.isGameMode {
-                Text(inputText)
-                    .font(.caption)
-                    .foregroundColor(.white)
-                //                        .padding(.bottom, 35)
-                    .padding(.leading, 17)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .zIndex(1)
+                if isInsertMode {
+                    TextField("Enter text", text: $inputText)
+                        .textFieldStyle(.plain)
+                        .focused($isFocused)
+                        .font(.system(size: 7))
+                        .padding(3)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                        .padding(.top, 0)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .zIndex(1)
+                        .onSubmit {
+                            isInsertMode = false
+                            isFocused = false
+                        }
+                } else {
+                    Text(inputText)
+                        .font(.system(size: 7))
+                        .foregroundColor(.white)
+                        .padding(3)
+                        .padding(.horizontal)
+                        .padding(.top, 0)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .zIndex(1)
+                }
             }
+            
             //2. timer
             if timerModel.isGameMode {
                 Text("?")
@@ -71,6 +87,9 @@ struct MinimalTimerView: View {
         }
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .onChange(of: isInsertMode) { newValue in
+            isFocused = newValue
+        }
         .onAppear {
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 // Only handle events when this view is active
@@ -133,31 +152,8 @@ struct MinimalTimerView: View {
                     isInsertMode = true
                     return nil
                 } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                    if isInsertMode {
-                        isInsertMode = false
-                    }
-                    return nil
-                }
-                
-                if isInsertMode {
-                    if event.keyCode == 51 { // Backspace key
-                        if event.modifierFlags.contains(.command) {
-                            // Command + Backspace: clear all text
-                            inputText = ""
-                        } else if event.modifierFlags.contains(.option) {
-                            // Option + Backspace: delete last word
-                            inputText = deleteLastWord(from: inputText)
-                        } else if !inputText.isEmpty {
-                            // Regular Backspace: remove last character
-                            inputText.removeLast()
-                        }
-                    } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
-                        let mappedChar = mapKoreanToEnglish(inputChar)
-                        inputText += String(mappedChar)
-                    } else {
-                        // Add feedback when limit is reached
-                        NSSound.beep()
-                    }
+                    isInsertMode = false
+                    isFocused = false
                     return nil
                 }
                 
@@ -173,33 +169,5 @@ struct MinimalTimerView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.accumulatedNumber = "" // Reset for next input
         }
-    }
-    
-    private func mapKoreanToEnglish(_ char: Character) -> Character {
-        if let englishChar = koreanToEnglish[char] {
-            return englishChar
-        } else if char.isASCII && char.isLetter {
-            return char.lowercased().first!
-        } else {
-            return char
-        }
-    }
-    
-    private func deleteLastWord(from text: String) -> String {
-        guard !text.isEmpty else { return text }
-        
-        var newText = text
-        
-        // First, remove trailing spaces
-        while newText.last?.isWhitespace == true {
-            newText.removeLast()
-        }
-        
-        // Then remove the last word
-        while !newText.isEmpty && !newText.last!.isWhitespace {
-            newText.removeLast()
-        }
-        
-        return newText
     }
  }
