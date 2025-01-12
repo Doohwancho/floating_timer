@@ -11,229 +11,125 @@ struct ContentView: View {
         case minimalTimer
         case transparentTimer
         case calendar
-//        case todoList
+        //        case todoList
     }
     @State private var activeView: ActiveView = .minimalTimer
     
     @State private var accumulatedNumber: String = ""
     @State private var isInsertMode = false
-    private let MAX_CHAR_LIMIT = 14
+    
     @State private var inputText = ""
     @State private var currentDate = Date().addingTimeInterval(TimeInterval(TimeZone(identifier: "Asia/Seoul")!.secondsFromGMT()))
-    
-    
-    // Korean to English mapping
-    let koreanToEnglish: [Character: Character] = [
-        "ㅁ": "a", "ㅠ": "b", "ㅊ": "c", "ㅇ": "d", "ㄷ": "e", "ㄹ": "f", "ㅎ": "g",
-        "ㅗ": "h", "ㅑ": "i", "ㅓ": "j", "ㅏ": "k", "ㅣ": "l", "ㅡ": "m", "ㅜ": "n",
-        "ㅐ": "o", "ㅔ": "p", "ㅂ": "q", "ㄱ": "r", "ㄴ": "s", "ㅅ": "t", "ㅕ": "u",
-        "ㅍ": "v", "ㅈ": "w", "ㅌ": "x", "ㅛ": "y", "ㅋ": "z"
-    ]
+    //    @State private var shouldResizeWindow = false
     
     var body: some View {
         Group {
             switch activeView {
-                case .minimalTimer:
+            case .minimalTimer:
                 if timerModel.showResult {
                     ResultView(timerModel: timerModel)
                         .frame(width: ViewDimensions.minimalTimerWithResult.size.width,
                                height: ViewDimensions.minimalTimerWithResult.size.height)
                 } else {
-                    MinimalTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel, inputText: $inputText)
-                        .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
+                    MinimalTimerView(
+                        timerModel: self.timerModel,
+                        accumulatedTimeModel: self.accumulatedTimeModel,
+                        activeView: $activeView,
+                        inputText: $inputText
+                    ).frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                 }
-                case .transparentTimer:
-                    TransparentTimerView(timerModel: self.timerModel)
-                        .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
-                case .calendar:
-                    CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
-                        .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
-//                case .todoList:
-//                    TodoListView(activeView: $activeView)
-//                        .frame(width: ViewDimensions.minimalTimer.size.width,
-//                               height: ViewDimensions.minimalTimer.size.height)
-                }
-            }
-            .onChange(of: timerModel.showResult) { _, _ in
-                DispatchQueue.main.async {
-                    if let window = NSApplication.shared.windows.first {
-                        configureWindow(window)
-                    }
-                }
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                accumulatedTimeModel.scenePhase = newPhase
-            }
-            .background(WindowAccessor { window in
-                configureWindow(window)
-            })
-            .onAppear {
-                accumulatedTimeModel.recalculateStreaks()
-                
-                NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                    //TODO - disable caplocks key during insert mode
-                    
-                    if event.modifierFlags.contains(.command) {
-                        switch event.keyCode {
-//                            case 50: // Command + `
-//                                activeView = .todoList
-//                                DispatchQueue.main.async {
-//                                    if let window = NSApplication.shared.windows.first {
-//                                        configureWindow(window)
-//                                    }
-//                                }
-//                            case 36: // Command + Return
-//                                if activeView == .todoList,
-//                                   let selectedTodo = TodoListState.shared.selectedTodo {
-//                                    activeView = .minimalTimer
-//                                    inputText = selectedTodo.text
-//                                    DispatchQueue.main.async {
-//                                        if let window = NSApplication.shared.windows.first {
-//                                            configureWindow(window)
-//                                        }
-//                                    }
-//                                }
-//                            case 51: // Command + Delete
-//                                if activeView == .todoList,
-//                                   let selectedIndex = TodoListState.shared.selectedIndex {
-//                                    TodoListState.shared.todos.remove(at: selectedIndex)
-//                                    if TodoListState.shared.todos.isEmpty {
-//                                        TodoListState.shared.selectedIndex = nil
-//                                    } else {
-//                                        TodoListState.shared.selectedIndex = min(selectedIndex, TodoListState.shared.todos.count - 1)
-//                                    }
-//                                }
-//                                return nil
-                            case 18: // Command + 1
-                                activeView = .minimalTimer
-                                accumulatedTimeModel.checkForDateChange()
-                                DispatchQueue.main.async {
-                                    if let window = NSApplication.shared.windows.first {
-                                        configureWindow(window)
-                                    }
-                                }
-                                return nil
-                            case 19: // Command + 2
-                                activeView = .transparentTimer
-                                accumulatedTimeModel.checkForDateChange()
-                                DispatchQueue.main.async {
-                                    if let window = NSApplication.shared.windows.first {
-                                        configureWindow(window)
-                                    }
-                                }
-                                return nil
-                            case 20: // Command + 3
-                                activeView = .calendar
-                                accumulatedTimeModel.checkForDateChange()
-                                DispatchQueue.main.async {
-                                    if let window = NSApplication.shared.windows.first {
-                                        configureWindow(window)
-                                    }
-                                }
-                                return nil
-                            case 1: // Command + S
-                                if self.timerModel.isRunning {
-                                    self.timerModel.pauseTimer()
-                                } else {
-                                    self.timerModel.startTimerIncrease()
-                                }
-                                return nil
-                            case 13: // Command + W
-                                NSApplication.shared.terminate(self)
-                                return nil
-                            default:
-                                break
-                        }
-                    }
-                    
-                    if self.activeView == .calendar {
-                        switch event.keyCode {
-                            case 4: // 'h' key
-                                self.currentDate = Calendar.current.date(byAdding: .month, value: -1, to: self.currentDate) ?? self.currentDate
-                                return nil
-                            case 37: // 'l' key
-                                self.currentDate = Calendar.current.date(byAdding: .month, value: 1, to: self.currentDate) ?? self.currentDate
-                                return nil
-                            default:
-                                break
-                        }
-                    }
-                    
-                    if activeView == .minimalTimer {
-                        if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
-                            isInsertMode = true
-                            return nil
-                        } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                            if isInsertMode {
-                                isInsertMode = false
-                            }
-                            return nil
-                        }
-                        
-                        if isInsertMode {
-                            if event.keyCode == 51 { // Backspace key
-                                if event.modifierFlags.contains(.command) {
-                                    // Command + Backspace: clear all text
-                                    inputText = ""
-                                } else if event.modifierFlags.contains(.option) {
-                                    // Option + Backspace: delete last word
-                                    inputText = deleteLastWord(from: inputText)
-                                } else if !inputText.isEmpty {
-                                    // Regular Backspace: remove last character
-                                    inputText.removeLast()
-                                }
-                            } else if let inputChar = event.characters?.first, inputText.count < MAX_CHAR_LIMIT {
-                                let mappedChar = mapKoreanToEnglish(inputChar)
-                                inputText += String(mappedChar)
-                            } else {
-                                // Add feedback when limit is reached
-                                NSSound.beep()
-                            }
-                            return nil
-                        }
-                    }
-                    
-                    if event.keyCode == 49 { // Spacebar
-                        // If we're showing results, reset to timer view
-                        if self.timerModel.showResult {
-                            self.timerModel.showResult = false
-                            self.timerModel.isGameMode = false
-                            // Reset to default timer state or keep last time
-                            self.timerModel.timeRemaining = 600 // default time
-                        }
-                        else if self.timerModel.isRunning {
-                            // Stop timer (either game mode or normal mode)
-                            if self.timerModel.isGameMode {
-                                self.timerModel.stopGameMode()
-                            } else {
-                                self.timerModel.pauseTimer()
-                            }
-                        } else {
-                            // Start game mode
-                            self.timerModel.startGameMode()
-                        }
-                        return nil
-                    }
-                    
-                    // Handle number input
-                    if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
-                        if let characters = event.characters {
-                            for character in characters {
-                                if character.isNumber {
-                                    self.accumulatedNumber.append(character)
-                                    self.finalizeInput()
-                                    return nil
-                                }
-                            }
-                        }
-                    }
-                    
-                    return event
-                }
-            } .onDisappear { //before app terminates, update max streaks
-                self.accumulatedTimeModel.updateStreaks()
+            case .transparentTimer:
+                TransparentTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel)
+                    .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
+            case .calendar:
+                CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
+                    .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
+                //                case .todoList:
+                //                    TodoListView(activeView: $activeView)
+                ////                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
+                //                        .frame(
+                //                            width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
+                //                            height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
+                //                        )
             }
         }
+        .onChange(of: timerModel.showResult) { _, _ in
+            DispatchQueue.main.async {
+                if let window = NSApplication.shared.windows.first {
+                    configureWindow(window)
+                }
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            accumulatedTimeModel.scenePhase = newPhase
+        }
+        //            .onChange(of: shouldResizeWindow) { newValue in
+        //                if newValue {
+        //                    DispatchQueue.main.async {
+        //                        if let window = NSApplication.shared.windows.first {
+        //                            configureWindow(window)
+        //                        }
+        //                        shouldResizeWindow = false  // Reset the trigger
+        //                    }
+        //                }
+        //            }
+        .background(WindowAccessor { window in
+            configureWindow(window)
+        })
+        .onAppear {
+            accumulatedTimeModel.recalculateStreaks()
+            
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                //switching between views
+                if event.modifierFlags.contains(.command) {
+                    switch event.keyCode {
+                        //                            case 50: // Command + `
+                        //                                activeView = .todoList
+                        //                                DispatchQueue.main.async {
+                        //                                    if let window = NSApplication.shared.windows.first {
+                        //                                        configureWindow(window)
+                        //                                    }
+                        //                                }
+                    case 18: // Command + 1
+                        activeView = .minimalTimer
+                        accumulatedTimeModel.checkForDateChange()
+                        DispatchQueue.main.async {
+                            if let window = NSApplication.shared.windows.first {
+                                configureWindow(window)
+                            }
+                        }
+                        //                                return nil
+                    case 19: // Command + 2
+                        activeView = .transparentTimer
+                        accumulatedTimeModel.checkForDateChange()
+                        DispatchQueue.main.async {
+                            if let window = NSApplication.shared.windows.first {
+                                configureWindow(window)
+                            }
+                        }
+                        //                                return nil
+                    case 20: // Command + 3
+                        activeView = .calendar
+                        accumulatedTimeModel.checkForDateChange()
+                        DispatchQueue.main.async {
+                            if let window = NSApplication.shared.windows.first {
+                                configureWindow(window)
+                            }
+                        }
+                        //                                return nil
+                    case 13: // Command + W
+                        NSApplication.shared.terminate(self)
+                        //                                return nil
+                    default:
+                        break
+                    }
+                }
+                return event
+            }
+        }.onDisappear { //before app terminates, update max streaks
+            self.accumulatedTimeModel.updateStreaks()
+        }
+    }
     
     private func configureWindow(_ window: NSWindow?) {
         guard let window = window else { return }
@@ -297,46 +193,9 @@ struct ContentView: View {
        case .calendar:
            return ViewDimensions.calendar.size
 //       case .todoList:
-//           return ViewDimensions.todoList.size
+//           return ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size
        }
    }
-    
-    private func finalizeInput() {
-        if let finalNumber = Int(self.accumulatedNumber) {
-            self.timerModel.setTimer(with: finalNumber)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.accumulatedNumber = "" // Reset for next input
-        }
-    }
-    
-    private func mapKoreanToEnglish(_ char: Character) -> Character {
-        if let englishChar = koreanToEnglish[char] {
-            return englishChar
-        } else if char.isASCII && char.isLetter {
-            return char.lowercased().first!
-        } else {
-            return char
-        }
-    }
-    
-    private func deleteLastWord(from text: String) -> String {
-        guard !text.isEmpty else { return text }
-        
-        var newText = text
-        
-        // First, remove trailing spaces
-        while newText.last?.isWhitespace == true {
-            newText.removeLast()
-        }
-        
-        // Then remove the last word
-        while !newText.isEmpty && !newText.last!.isWhitespace {
-            newText.removeLast()
-        }
-        
-        return newText
-    }
     
     struct WindowAccessor: NSViewRepresentable {
         let callback: (NSWindow?) -> Void

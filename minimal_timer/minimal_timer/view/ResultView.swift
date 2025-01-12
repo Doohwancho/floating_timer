@@ -2,7 +2,8 @@ import Foundation
 import SwiftUI
 
 struct ResultView: View {
-    @ObservedObject var timerModel: TimerModel
+//    @ObservedObject var timerModel: TimerModel
+    let timerModel: TimerModel
     
     var body: some View {
         VStack(alignment: .center, spacing: 4) {

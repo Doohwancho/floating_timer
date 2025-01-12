@@ -4,8 +4,8 @@ import Foundation
 
 struct TransparentTimerView: View {
     @ObservedObject var timerModel:TimerModel
-//     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel //TODO: accumulated time not represented in FirstTimerView yet
-    
+    @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
+    @State private var accumulatedNumber: String = ""
 
     var body: some View {
         VStack {
@@ -83,5 +83,69 @@ struct TransparentTimerView: View {
         }
         .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
         .background(Color(white:0.95))
+        .onAppear {
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                //feat1: set time
+                if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
+                    if let characters = event.characters {
+                        for character in characters {
+                            if character.isNumber {
+                                self.accumulatedNumber.append(character)
+                                self.finalizeInput()
+                                return nil
+                            }
+                        }
+                    }
+                }
+                
+                //feat2: decremental timer
+                if event.keyCode == 49 { // Spacebar
+                    // If we're showing results, reset to timer view
+                    if self.timerModel.showResult {
+                        self.timerModel.showResult = false
+                        self.timerModel.isGameMode = false
+                        // Reset to default timer state or keep last time
+                        self.timerModel.timeRemaining = 600 // default time
+                    }
+                    else if self.timerModel.isRunning {
+                        // Stop timer (either game mode or normal mode)
+                        if self.timerModel.isGameMode {
+                            self.timerModel.stopGameMode()
+                        } else {
+                            self.timerModel.pauseTimer()
+                        }
+                    } else {
+                        // Start game mode
+                        self.timerModel.startGameMode()
+                    }
+                    return nil
+                }
+                
+                //feat3: incremental timer
+                if event.modifierFlags.contains(.command) {
+                    switch event.keyCode {
+                    case 1: // Command + S
+                        if self.timerModel.isRunning {
+                            self.timerModel.pauseTimer()
+                        } else {
+                            self.timerModel.startTimerIncrease()
+                        }
+                        return nil
+                    default:
+                        break
+                    }
+                }
+                
+                return event
+            }
+        }
+    }
+    private func finalizeInput() {
+        if let finalNumber = Int(self.accumulatedNumber) {
+            self.timerModel.setTimer(with: finalNumber)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.accumulatedNumber = "" // Reset for next input
+        }
     }
 }

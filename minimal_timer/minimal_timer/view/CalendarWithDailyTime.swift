@@ -68,6 +68,22 @@ struct CalendarWithDailyTimeView: View {
         }
         .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
         .background(Color(white:0.983))
+        .onAppear {
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                switch event.keyCode {
+                    case 4: // 'h' key
+                        self.currentDate = Calendar.current.date(byAdding: .month, value: -1, to: self.currentDate) ?? self.currentDate
+                        return nil
+                    case 37: // 'l' key
+                        self.currentDate = Calendar.current.date(byAdding: .month, value: 1, to: self.currentDate) ?? self.currentDate
+                        return nil
+                    default:
+                        break
+                }
+                
+                return event
+            }
+        }
     }
     
     private func days() -> [Date] {
