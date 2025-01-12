@@ -26,7 +26,11 @@ struct ContentView: View {
         Group {
             switch activeView {
             case .todoList:
-                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
+                TodoListView(
+                    activeView: $activeView,
+                    shouldResizeWindow: $shouldResizeWindow,
+                    inputText: $inputText
+                )
                     .frame(
                         width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
                         height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height

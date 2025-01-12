@@ -6,8 +6,11 @@ struct TodoListView: View {
     @State private var isInsertMode = false
     @State private var isEditMode = false
     @State private var todoText = ""
+    
     @Binding var activeView: ContentView.ActiveView
     @Binding var shouldResizeWindow: Bool
+    @Binding var inputText: String
+    
     @FocusState private var isFocused: Bool
     @State private var eventMonitor: Any?
     @State private var scrollProxy: ScrollViewProxy?
@@ -224,12 +227,22 @@ struct TodoListView: View {
             }
             return true
         case 36: // Enter key
-            if let selectedIndex = todoState.selectedIndex {
-                isEditMode = true
-                isInsertMode = false
-                todoText = todoState.todos[selectedIndex].text  // Pre-fill with existing text
-                isFocused = true
-                return true
+            if event.modifierFlags.contains(.command) {
+                // Handle Command + Enter
+                if let selectedTodo = todoState.selectedTodo {
+                    activeView = .minimalTimer
+                    inputText = selectedTodo.text
+                    return true
+                }
+            } else {
+                // Handle regular Enter
+                if let selectedIndex = todoState.selectedIndex {
+                    isEditMode = true
+                    isInsertMode = false
+                    todoText = todoState.todos[selectedIndex].text
+                    isFocused = true
+                    return true
+                }
             }
             return false
         case 38: // 'j' key
@@ -258,17 +271,6 @@ struct TodoListView: View {
     
     private func handleCommandKeys(_ event: NSEvent) -> Bool {
         switch event.keyCode {
-//        case 36: // Command + Return
-//            if activeView == .todoList,
-//               let selectedTodo = TodoListState.shared.selectedTodo {
-//                activeView = .minimalTimer
-//                inputText = selectedTodo.text
-//                DispatchQueue.main.async {
-//                    if let window = NSApplication.shared.windows.first {
-//                        configureWindow(window)
-//                    }
-//                }
-//            }
         case 51: // Command + Delete
             if let selectedIndex = todoState.selectedIndex {
                 todoState.todos.remove(at: selectedIndex)
