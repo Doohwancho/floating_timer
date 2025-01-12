@@ -5,6 +5,7 @@ enum ViewDimensions {
     case minimalTimerWithResult
     case transparentTimer
     case calendar
+    case todoList(numberOfTodos: Int)
     
     var size: CGSize {
         switch self {
@@ -16,6 +17,12 @@ enum ViewDimensions {
             return CGSize(width: 270, height: 120)
         case .calendar:
             return CGSize(width: 295, height: 380)
+        case .todoList(let numberOfTodos):
+            let baseHeight: CGFloat = 50 // Height for empty state
+            let todoItemHeight: CGFloat = 40 // Height per todo item (including padding)
+            let maxHeight: CGFloat = 600 // Maximum height before scrolling
+            let calculatedHeight = baseHeight + CGFloat(numberOfTodos) * todoItemHeight
+            return CGSize(width: 200, height: min(calculatedHeight, maxHeight))
         }
     }
 }

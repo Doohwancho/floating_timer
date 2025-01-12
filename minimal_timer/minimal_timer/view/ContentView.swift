@@ -11,7 +11,7 @@ struct ContentView: View {
         case minimalTimer
         case transparentTimer
         case calendar
-//        case todoList
+        case todoList
     }
     @State private var activeView: ActiveView = .minimalTimer
     
@@ -20,7 +20,7 @@ struct ContentView: View {
     
     @State private var inputText = ""
     @State private var currentDate = Date().addingTimeInterval(TimeInterval(TimeZone(identifier: "Asia/Seoul")!.secondsFromGMT()))
-    //    @State private var shouldResizeWindow = false
+    @State private var shouldResizeWindow = false
     
     var body: some View {
         Group {
@@ -52,13 +52,12 @@ struct ContentView: View {
                     currentDate: $currentDate,
                     activeView: $activeView
                 ).frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
-//            case .todoList:
-//                TodoListView(activeView: $activeView)
-////                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
-//                    .frame(
-//                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
-//                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
-//                    )
+            case .todoList:
+                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
+                    .frame(
+                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
+                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
+                    )
             }
         }
         .onChange(of: timerModel.showResult) { _, _ in
@@ -71,16 +70,16 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             accumulatedTimeModel.scenePhase = newPhase
         }
-        //            .onChange(of: shouldResizeWindow) { newValue in
-        //                if newValue {
-        //                    DispatchQueue.main.async {
-        //                        if let window = NSApplication.shared.windows.first {
-        //                            configureWindow(window)
-        //                        }
-        //                        shouldResizeWindow = false  // Reset the trigger
-        //                    }
-        //                }
-        //            }
+        .onChange(of: shouldResizeWindow) { newValue in
+            if newValue {
+                DispatchQueue.main.async {
+                    if let window = NSApplication.shared.windows.first {
+                        configureWindow(window)
+                    }
+                    shouldResizeWindow = false  // Reset the trigger
+                }
+            }
+        }
         .background(WindowAccessor { window in
             configureWindow(window)
         })
@@ -91,13 +90,13 @@ struct ContentView: View {
                 //switching between views
                 if event.modifierFlags.contains(.command) {
                     switch event.keyCode {
-//                    case 50: // Command + `
-//                        activeView = .todoList
-//                        DispatchQueue.main.async {
-//                            if let window = NSApplication.shared.windows.first {
-//                                configureWindow(window)
-//                            }
-//                        }
+                    case 50: // Command + `
+                        activeView = .todoList
+                        DispatchQueue.main.async {
+                            if let window = NSApplication.shared.windows.first {
+                                configureWindow(window)
+                            }
+                        }
                     case 18: // Command + 1
                         activeView = .minimalTimer
                         accumulatedTimeModel.checkForDateChange()
@@ -200,8 +199,8 @@ struct ContentView: View {
            return ViewDimensions.transparentTimer.size
        case .calendar:
            return ViewDimensions.calendar.size
-//       case .todoList:
-//           return ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size
+       case .todoList:
+           return ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size
        }
    }
     
