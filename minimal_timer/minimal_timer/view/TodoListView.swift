@@ -11,8 +11,15 @@ struct TodoListView: View {
     @FocusState private var isFocused: Bool
     @State private var eventMonitor: Any?
     @State private var scrollProxy: ScrollViewProxy?
+    @State private var insertPosition: InsertPosition = .bottom
         
     
+    enum InsertPosition {
+        case bottom      // 'i' - add at bottom
+        case below       // 'o' - add below current
+        case above       // 'O' - add above current
+    }
+        
     private var currentSize: CGSize {
         ViewDimensions.todoList(numberOfTodos: todoState.todos.count).size
     }
@@ -120,7 +127,24 @@ struct TodoListView: View {
     
     private func handleTodoSubmit() {
         if !todoText.isEmpty {
-            todoState.todos.append(TodoItem(text: todoText))
+            switch insertPosition {
+            case .bottom:
+                todoState.todos.append(TodoItem(text: todoText))
+            case .below:
+                if let selectedIndex = todoState.selectedIndex {
+                    todoState.todos.insert(TodoItem(text: todoText), at: selectedIndex + 1)
+                    todoState.selectedIndex = selectedIndex + 1
+                } else {
+                    todoState.todos.append(TodoItem(text: todoText))
+                }
+            case .above:
+                if let selectedIndex = todoState.selectedIndex {
+                    todoState.todos.insert(TodoItem(text: todoText), at: selectedIndex)
+                    todoState.selectedIndex = selectedIndex
+                } else {
+                    todoState.todos.insert(TodoItem(text: todoText), at: 0)
+                }
+            }
             todoText = ""
         }
         isInsertMode = false
@@ -181,7 +205,23 @@ struct TodoListView: View {
         case 34: // 'i' key
             isInsertMode = true
             isEditMode = false
+            insertPosition = .bottom
             isFocused = true
+            return true
+        case 31: // 'o' key
+            if event.modifierFlags.contains(.shift) {
+                // Capital 'O'
+                isInsertMode = true
+                isEditMode = false
+                insertPosition = .above
+                isFocused = true
+            } else {
+                // Lowercase 'o'
+                isInsertMode = true
+                isEditMode = false
+                insertPosition = .below
+                isFocused = true
+            }
             return true
         case 36: // Enter key
             if let selectedIndex = todoState.selectedIndex {
