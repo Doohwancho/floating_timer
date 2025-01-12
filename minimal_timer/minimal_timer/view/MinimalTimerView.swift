@@ -97,7 +97,7 @@ struct MinimalTimerView: View {
                         self.timerModel.showResult = false
                         self.timerModel.isGameMode = false
                         // Reset to default timer state or keep last time
-                        self.timerModel.timeRemaining = 600 // default time
+                        //self.timerModel.timeRemaining = 600  // default time
                     }
                     else if self.timerModel.isRunning {
                         // Stop timer (either game mode or normal mode)

@@ -128,8 +128,16 @@ class TimerModel: ObservableObject {
     
     // Regular timer display format
     func formatTime(_ seconds: Int) -> String {
-        let time = secondsToTimeComponents(Double(seconds))
-        return String(format: "%02d:%02d", time.minutes, time.seconds)
+        let isNegative = seconds < 0
+        let absoluteSeconds = abs(seconds)
+        let minutes = absoluteSeconds / 60
+        let remainingSeconds = absoluteSeconds % 60
+        
+        if isNegative {
+            return String(format: "-%02d:%02d", minutes, remainingSeconds)
+        } else {
+            return String(format: "%02d:%02d", minutes, remainingSeconds)
+        }
     }
     
     private func playAlarmSound() {
