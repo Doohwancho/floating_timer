@@ -10,6 +10,8 @@ struct TodoListView: View {
     @Binding var shouldResizeWindow: Bool
     @FocusState private var isFocused: Bool
     @State private var eventMonitor: Any?
+    @State private var scrollProxy: ScrollViewProxy?
+        
     
     private var currentSize: CGSize {
         ViewDimensions.todoList(numberOfTodos: todoState.todos.count).size
@@ -50,17 +52,31 @@ struct TodoListView: View {
                     .padding(.vertical, 8)
                     .padding(.horizontal, 8)
             } else {
-                ScrollView {
-                    VStack(spacing: 8) {
-                        ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
-                            Text(todo.text)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(8)
-                                .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
-                                .cornerRadius(8)
+                ScrollView(.vertical, showsIndicators: false) {
+                    ScrollViewReader { proxy in
+                        VStack(spacing: 8) {
+                            ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
+                                Text(todo.text)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(8)
+                                    .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
+                                    .cornerRadius(8)
+                                    .id(index) // Add id for scrolling
+                            }
+                        }
+                        .padding(.horizontal)
+                        .onChange(of: todoState.selectedIndex) { _, newIndex in
+                            if let index = newIndex {
+                                // Scroll to the selected item with animation
+                                withAnimation {
+                                    proxy.scrollTo(index, anchor: .center)
+                                }
+                            }
+                        }
+                        .onAppear {
+                            scrollProxy = proxy
                         }
                     }
-                    .padding(.horizontal)
                 }
             }
         }
