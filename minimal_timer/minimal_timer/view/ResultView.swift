@@ -5,6 +5,8 @@ struct ResultView: View {
 //    @ObservedObject var timerModel: TimerModel
     let timerModel: TimerModel
     
+    @Binding var activeView: ContentView.ActiveView
+    
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
             // Main accuracy percentage
@@ -25,5 +27,15 @@ struct ResultView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .onAppear {
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                // Only handle events when this view is active
+                guard activeView == .minimalTimer else { return event }
+                
+                //add keyboard shortcut's event listener here if needed
+                
+                return event
+            }
+        }
     }
 }

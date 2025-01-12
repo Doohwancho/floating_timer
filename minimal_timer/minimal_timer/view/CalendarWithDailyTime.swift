@@ -3,6 +3,8 @@ import SwiftUI
 struct CalendarWithDailyTimeView: View {
     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
     @Binding var currentDate: Date
+    @Binding var activeView: ContentView.ActiveView
+    
     @State private var selectedDate: Date?
     
     private let calendar: Calendar = {
@@ -70,6 +72,9 @@ struct CalendarWithDailyTimeView: View {
         .background(Color(white:0.983))
         .onAppear {
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                // Only handle events when this view is active
+                guard activeView == .calendar else { return event }
+                
                 switch event.keyCode {
                     case 4: // 'h' key
                         self.currentDate = Calendar.current.date(byAdding: .month, value: -1, to: self.currentDate) ?? self.currentDate

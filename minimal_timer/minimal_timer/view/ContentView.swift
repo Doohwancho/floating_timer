@@ -11,7 +11,7 @@ struct ContentView: View {
         case minimalTimer
         case transparentTimer
         case calendar
-        //        case todoList
+//        case todoList
     }
     @State private var activeView: ActiveView = .minimalTimer
     
@@ -27,8 +27,10 @@ struct ContentView: View {
             switch activeView {
             case .minimalTimer:
                 if timerModel.showResult {
-                    ResultView(timerModel: timerModel)
-                        .frame(width: ViewDimensions.minimalTimerWithResult.size.width,
+                    ResultView(
+                        timerModel: timerModel,
+                        activeView: $activeView
+                    ).frame(width: ViewDimensions.minimalTimerWithResult.size.width,
                                height: ViewDimensions.minimalTimerWithResult.size.height)
                 } else {
                     MinimalTimerView(
@@ -39,18 +41,24 @@ struct ContentView: View {
                     ).frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                 }
             case .transparentTimer:
-                TransparentTimerView(timerModel: self.timerModel, accumulatedTimeModel: self.accumulatedTimeModel)
-                    .frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
+                TransparentTimerView(
+                    timerModel: self.timerModel,
+                    accumulatedTimeModel: self.accumulatedTimeModel,
+                    activeView: $activeView
+                ).frame(width: ViewDimensions.transparentTimer.size.width, height: ViewDimensions.transparentTimer.size.height)
             case .calendar:
-                CalendarWithDailyTimeView(accumulatedTimeModel: self.accumulatedTimeModel, currentDate: $currentDate)
-                    .frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
-                //                case .todoList:
-                //                    TodoListView(activeView: $activeView)
-                ////                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
-                //                        .frame(
-                //                            width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
-                //                            height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
-                //                        )
+                CalendarWithDailyTimeView(
+                    accumulatedTimeModel: self.accumulatedTimeModel,
+                    currentDate: $currentDate,
+                    activeView: $activeView
+                ).frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
+//            case .todoList:
+//                TodoListView(activeView: $activeView)
+////                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
+//                    .frame(
+//                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
+//                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
+//                    )
             }
         }
         .onChange(of: timerModel.showResult) { _, _ in
@@ -83,13 +91,13 @@ struct ContentView: View {
                 //switching between views
                 if event.modifierFlags.contains(.command) {
                     switch event.keyCode {
-                        //                            case 50: // Command + `
-                        //                                activeView = .todoList
-                        //                                DispatchQueue.main.async {
-                        //                                    if let window = NSApplication.shared.windows.first {
-                        //                                        configureWindow(window)
-                        //                                    }
-                        //                                }
+//                    case 50: // Command + `
+//                        activeView = .todoList
+//                        DispatchQueue.main.async {
+//                            if let window = NSApplication.shared.windows.first {
+//                                configureWindow(window)
+//                            }
+//                        }
                     case 18: // Command + 1
                         activeView = .minimalTimer
                         accumulatedTimeModel.checkForDateChange()

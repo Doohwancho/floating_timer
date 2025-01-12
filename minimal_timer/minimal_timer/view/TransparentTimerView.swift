@@ -5,6 +5,9 @@ import Foundation
 struct TransparentTimerView: View {
     @ObservedObject var timerModel:TimerModel
     @ObservedObject var accumulatedTimeModel: AccumulatedTimeModel
+    
+    @Binding var activeView: ContentView.ActiveView
+    
     @State private var accumulatedNumber: String = ""
 
     var body: some View {
@@ -85,6 +88,9 @@ struct TransparentTimerView: View {
         .background(Color(white:0.95))
         .onAppear {
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                // Only handle events when this view is active
+                guard activeView == .transparentTimer else { return event }
+                
                 //feat1: set time
                 if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
                     if let characters = event.characters {
