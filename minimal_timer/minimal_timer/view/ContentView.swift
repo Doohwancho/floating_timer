@@ -8,10 +8,10 @@ struct ContentView: View {
     
     // Enum to track which UI is active
     enum ActiveView {
+        case todoList
         case minimalTimer
         case transparentTimer
         case calendar
-        case todoList
     }
     @State private var activeView: ActiveView = .minimalTimer
     
@@ -25,6 +25,12 @@ struct ContentView: View {
     var body: some View {
         Group {
             switch activeView {
+            case .todoList:
+                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
+                    .frame(
+                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
+                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
+                    )
             case .minimalTimer:
                 if timerModel.showResult {
                     ResultView(
@@ -52,12 +58,6 @@ struct ContentView: View {
                     currentDate: $currentDate,
                     activeView: $activeView
                 ).frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
-            case .todoList:
-                TodoListView(activeView: $activeView, shouldResizeWindow: $shouldResizeWindow)
-                    .frame(
-                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
-                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
-                    )
             }
         }
         .onChange(of: timerModel.showResult) { _, _ in

@@ -18,10 +18,18 @@ enum ViewDimensions {
         case .calendar:
             return CGSize(width: 295, height: 380)
         case .todoList(let numberOfTodos):
-            let baseHeight: CGFloat = 50 // Height for empty state
-            let todoItemHeight: CGFloat = 40 // Height per todo item (including padding)
-            let maxHeight: CGFloat = 600 // Maximum height before scrolling
-            let calculatedHeight = baseHeight + CGFloat(numberOfTodos) * todoItemHeight
+            let baseHeight: CGFloat = numberOfTodos == 0 ? 50 : 70 // Smaller height when empty
+            let todoItemHeight: CGFloat = 40
+            let inputHeight: CGFloat = 50 // Height for input field
+            let paddingHeight: CGFloat = 24 // Total vertical padding
+            
+            let calculatedHeight = if numberOfTodos == 0 {
+                baseHeight // Just show base height when empty
+            } else {
+                CGFloat(numberOfTodos) * todoItemHeight
+            }
+            
+            let maxHeight: CGFloat = 600
             return CGSize(width: 200, height: min(calculatedHeight, maxHeight))
         }
     }

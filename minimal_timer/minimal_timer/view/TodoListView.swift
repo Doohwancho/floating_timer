@@ -15,7 +15,7 @@ struct TodoListView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
             if isInsertMode {
                 TextField("New TODO", text: $todoText)
 //                    .textFieldStyle(PlainTextFieldStyle())
@@ -24,6 +24,8 @@ struct TodoListView: View {
                     .padding(8)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
                     .padding(.horizontal)
                     .foregroundColor(.white) //text color
                     .onSubmit {
@@ -39,6 +41,14 @@ struct TodoListView: View {
 //                    }
             }
             
+            if !isInsertMode && todoState.todos.isEmpty {
+                // Show placeholder when no todos and not in insert mode
+                Text("Press 'i' to add todo")
+                    .foregroundColor(.gray)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 8)
+            }
+            
             ScrollView {
                 VStack(spacing: 8) {
                     ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
@@ -49,12 +59,13 @@ struct TodoListView: View {
                             .cornerRadius(8)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
         }
+        .frame(width: currentSize.width, height: currentSize.height, alignment: .top)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
         .background(Color.black)
         .foregroundColor(.white)
-        .frame(width: currentSize.width, height: currentSize.height)
         .onChange(of: todoState.todos.count) { _ in
             shouldResizeWindow = true  // Trigger resize
         }
