@@ -8,12 +8,12 @@ struct MinimalTimerView: View {
     @Binding var activeView: ContentView.ActiveView
     
     @Binding var inputText: String
+    @State private var accumulatedNumber: String = ""
+    
+    @State private var eventMonitor: Any?
     @FocusState private var isFocused: Bool
     @State private var isInsertMode = false
-    private let MAX_CHAR_LIMIT = 14
     
-    @State private var accumulatedNumber: String = ""
-
     
     private var currentDimensions: ViewDimensions {
         timerModel.showResult ? .minimalTimerWithResult : .minimalTimer
@@ -37,8 +37,14 @@ struct MinimalTimerView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .zIndex(1)
                         .onSubmit {
-                            isInsertMode = false
-                            isFocused = false
+                            handleInsertModeChange(newValue: false)
+                        }
+                        .onAppear {
+                            handleInsertModeChange(newValue: true)
+                        }
+                        // Handle focus changes more gracefully
+                        .onChange(of: isInsertMode) { oldValue, newValue in
+                            isFocused = newValue
                         }
                 } else {
                     Text(inputText)
@@ -87,79 +93,141 @@ struct MinimalTimerView: View {
         }
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .onChange(of: isInsertMode) { newValue in
-            isFocused = newValue
+        .onChange(of: isInsertMode) { oldValue, newValue in
+            isFocused = newValue //TODO - handleInsertModeChange(newValue: newValue)로 바꿀까?
+//            print("------ onChange -------")
+//            print("oldValue: ", oldValue)
+//            print("newValue: ", newValue)
+//            print("isInsertMode: ", isInsertMode)
+//            print("isFocused: ", isFocused)
+        }
+        .onChange(of: activeView) { oldValue, newValue in
+            if newValue != .minimalTimer {
+                cleanupEventMonitor()
+            }
         }
         .onAppear {
+            // Clean up any existing monitor first
+            cleanupEventMonitor()
+            
+            // Reset states
+            handleInsertModeChange(newValue: false) //여기가 문젠가?
+            
+//            print("------ onAppear -------")
+//            print("isInsertMode: ", isInsertMode)
+//            print("isFocused: ", isFocused)
+            
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 // Only handle events when this view is active
                 guard activeView == .minimalTimer else { return event }
-
+            
                 
-                //feat1: set time
-                if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
-                    if let characters = event.characters {
-                        for character in characters {
-                            if character.isNumber {
-                                self.accumulatedNumber.append(character)
-                                self.finalizeInput()
-                                return nil
+                let isTypingMode = isInsertMode || isFocused
+                if !isTypingMode {
+                    print("---- right now, its NOT insertMode! ----")
+                    print("isInsertMode: ", isInsertMode)
+                    print("isFocused: ", isFocused)
+                    
+                
+                    //feat1: set time
+                    if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
+                        if let characters = event.characters {
+                            for character in characters {
+                                if character.isNumber {
+                                    self.accumulatedNumber.append(character)
+                                    self.finalizeInput()
+                                    return nil
+                                }
                             }
                         }
                     }
-                }
-                
-                //feat2: decremental timer
-                if !isInsertMode && event.keyCode == 49 { // Spacebar
-                    // If we're showing results, reset to timer view
-                    if self.timerModel.showResult {
-                        self.timerModel.showResult = false
-                        self.timerModel.isGameMode = false
-                        // Reset to default timer state or keep last time
-                        //self.timerModel.timeRemaining = 600  // default time
-                    }
-                    else if self.timerModel.isRunning {
-                        // Stop timer (either game mode or normal mode)
-                        if self.timerModel.isGameMode {
-                            self.timerModel.stopGameMode()
-                        } else {
-                            self.timerModel.pauseTimer()
+                    
+                    //feat2: decremental timer
+                    if event.keyCode == 49 { // Spacebar
+                        // If we're showing results, reset to timer view
+                        if self.timerModel.showResult {
+                            self.timerModel.showResult = false
+                            self.timerModel.isGameMode = false
+                            // Reset to default timer state or keep last time
+                            //self.timerModel.timeRemaining = 600  // default time
                         }
-                    } else {
-                        // Start game mode
-                        self.timerModel.startGameMode()
-                    }
-                    return nil
-                }
-                
-                //feat3: incremental timer
-                if !isInsertMode && event.modifierFlags.contains(.command) {
-                    switch event.keyCode {
-                    case 1: // Command + S
-                        if self.timerModel.isRunning {
-                            self.timerModel.pauseTimer()
+                        else if self.timerModel.isRunning {
+                            // Stop timer (either game mode or normal mode)
+                            if self.timerModel.isGameMode {
+                                self.timerModel.stopGameMode()
+                            } else {
+                                self.timerModel.pauseTimer()
+                            }
                         } else {
-                            self.timerModel.startTimerIncrease()
+                            // Start game mode
+                            self.timerModel.startGameMode()
                         }
                         return nil
-                    default:
-                        break
                     }
-                }
-                
-                //feat4: text 적기
-                if !isInsertMode && event.keyCode == 34  { // 34: 'i' key
-                    isInsertMode = true
-                    return nil
-                } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                    isInsertMode = false
-                    isFocused = false
-                    return nil
+                    
+                    //feat3: incremental timer
+                    if !timerModel.isGameMode && event.modifierFlags.contains(.command) {
+                        switch event.keyCode {
+                        case 1: // Command + S
+                            if self.timerModel.isRunning {
+                                self.timerModel.pauseTimer()
+                            } else {
+                                self.timerModel.startTimerIncrease()
+                            }
+                            return nil
+                        default:
+                            break
+                        }
+                    }
+                    
+                    //feat4: text 적기
+                    if !timerModel.isGameMode {
+                        if event.keyCode == 34  { // 34: 'i' key
+                            handleInsertModeChange(newValue: true)
+                            return nil
+                        } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
+                            handleInsertModeChange(newValue: false)
+                            return nil
+                        }
+                    }
                 }
                 
                 return event
             }
         }
+        .onDisappear {
+            cleanupEventMonitor()
+            handleInsertModeChange(newValue: false)
+        }
+    }
+    
+    private func cleanupEventMonitor() {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
+            print("Event monitor cleaned up - MinimalTimerView")
+        }
+    }
+    
+    private func handleInsertModeChange(newValue: Bool) {
+        if newValue {
+            // Entering insert mode
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
+                isInsertMode = true
+                isFocused = true
+            }
+        } else {
+            // Exiting insert mode
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
+                isInsertMode = false
+                isFocused = false
+            }
+        }
+        
+//        print("------ handleInsertModeChange -------")
+//        print("newValue: ", newValue)
+//        print("isInsertMode: ", isInsertMode)
+//        print("isFocused: ", isFocused)
     }
     
     private func finalizeInput() {

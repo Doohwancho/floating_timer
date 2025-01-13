@@ -22,6 +22,7 @@ struct TodoListView: View {
         case below       // 'o' - add below current
         case above       // 'O' - add above current
     }
+
         
     private var currentSize: CGSize {
         ViewDimensions.todoList(numberOfTodos: todoState.todos.count).size
@@ -230,6 +231,7 @@ struct TodoListView: View {
             if event.modifierFlags.contains(.command) {
                 // Handle Command + Enter
                 if let selectedTodo = todoState.selectedTodo {
+                    cleanupEventMonitor()
                     activeView = .minimalTimer
                     inputText = selectedTodo.text
                     DispatchQueue.main.async {
@@ -308,6 +310,7 @@ struct TodoListView: View {
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
+            print("Event monitor cleaned up - TodoListView")
         }
     }
 }

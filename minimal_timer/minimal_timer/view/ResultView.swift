@@ -6,6 +6,7 @@ struct ResultView: View {
     let timerModel: TimerModel
     
     @Binding var activeView: ContentView.ActiveView
+    @State private var eventMonitor: Any?
     
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
@@ -28,14 +29,24 @@ struct ResultView: View {
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .onAppear {
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                // Only handle events when this view is active
+            // Clean up any existing monitor first
+            cleanupEventMonitor()
+            
+            eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 guard activeView == .minimalTimer else { return event }
-                
-                //add keyboard shortcut's event listener here if needed
-                
+                print("ResutView's event Monoitor")
                 return event
             }
+        }
+        .onDisappear {
+            cleanupEventMonitor()
+        }
+    }
+    
+    private func cleanupEventMonitor() {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
         }
     }
 }
