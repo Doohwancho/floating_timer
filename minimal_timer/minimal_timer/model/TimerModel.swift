@@ -172,7 +172,7 @@ class TimerModel: ObservableObject {
         if percentage >= 80 && percentage <= 120 {
             consecutiveStreaks += 1
         } else {
-            consecutiveStreaks = 0
+            consecutiveStreaks = 0 //TODO - reset to zero is too harsh. change to accumulation and 
         }
     }
     

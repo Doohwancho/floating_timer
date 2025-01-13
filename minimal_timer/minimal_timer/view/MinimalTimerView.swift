@@ -40,7 +40,12 @@ struct MinimalTimerView: View {
                             handleInsertModeChange(newValue: false)
                         }
                         .onAppear {
-                            handleInsertModeChange(newValue: true)
+//                            handleInsertModeChange(newValue: true)
+                            DispatchQueue.main.async {
+                                NSApp.activate(ignoringOtherApps: true)
+                                isFocused = true
+                                isInsertMode = true
+                            }
                         }
                         // Handle focus changes more gracefully
                         .onChange(of: isInsertMode) { oldValue, newValue in
@@ -104,6 +109,7 @@ struct MinimalTimerView: View {
         .onChange(of: activeView) { oldValue, newValue in
             if newValue != .minimalTimer {
                 cleanupEventMonitor()
+                handleInsertModeChange(newValue: false)
             }
         }
         .onAppear {
@@ -189,6 +195,11 @@ struct MinimalTimerView: View {
         }
         .onDisappear {
             cleanupEventMonitor()
+            // 상태 초기화를 명시적으로 수행
+            DispatchQueue.main.async {
+                isInsertMode = false
+                isFocused = false
+            }
             handleInsertModeChange(newValue: false)
         }
     }
@@ -202,17 +213,17 @@ struct MinimalTimerView: View {
     }
     
     private func handleInsertModeChange(newValue: Bool) {
+        // Make state changes synchronously to avoid race conditions
+        withAnimation {
+            isInsertMode = newValue
+            isFocused = newValue
+        }
+        
+        // Force focus if entering insert mode
         if newValue {
-            // Entering insert mode
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
-                isInsertMode = true
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
                 isFocused = true
-            }
-        } else {
-            // Exiting insert mode
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
-                isInsertMode = false
-                isFocused = false
             }
         }
         
