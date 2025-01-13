@@ -111,7 +111,7 @@ struct MinimalTimerView: View {
             cleanupEventMonitor()
             
             // Reset states
-            handleInsertModeChange(newValue: false) //여기가 문젠가?
+            handleInsertModeChange(newValue: false) 
             
 //            print("------ onAppear -------")
 //            print("isInsertMode: ", isInsertMode)
@@ -119,15 +119,14 @@ struct MinimalTimerView: View {
             
             NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
                 // Only handle events when this view is active
-                guard activeView == .minimalTimer else { return event }
+                guard activeView == .minimalTimer && !timerModel.showResult else { return event }
             
                 
                 let isTypingMode = isInsertMode || isFocused
                 if !isTypingMode {
-                    print("---- right now, its NOT insertMode! ----")
-                    print("isInsertMode: ", isInsertMode)
-                    print("isFocused: ", isFocused)
-                    
+//                    print("---- right now, its NOT insertMode! ----")
+//                    print("isInsertMode: ", isInsertMode)
+//                    print("isFocused: ", isFocused)
                 
                     //feat1: set time
                     if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
@@ -144,14 +143,7 @@ struct MinimalTimerView: View {
                     
                     //feat2: decremental timer
                     if event.keyCode == 49 { // Spacebar
-                        // If we're showing results, reset to timer view
-                        if self.timerModel.showResult {
-                            self.timerModel.showResult = false
-                            self.timerModel.isGameMode = false
-                            // Reset to default timer state or keep last time
-                            //self.timerModel.timeRemaining = 600  // default time
-                        }
-                        else if self.timerModel.isRunning {
+                       if self.timerModel.isRunning {
                             // Stop timer (either game mode or normal mode)
                             if self.timerModel.isGameMode {
                                 self.timerModel.stopGameMode()

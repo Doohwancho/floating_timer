@@ -33,8 +33,20 @@ struct ResultView: View {
             cleanupEventMonitor()
             
             eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                guard activeView == .minimalTimer else { return event }
-                print("ResutView's event Monoitor")
+                guard activeView == .minimalTimer && timerModel.showResult else { return event }
+                
+                //feat: decremental timer
+                if event.keyCode == 49 { // Spacebar
+                    // If we're showing results, reset to timer view
+                    if self.timerModel.showResult {
+                        self.timerModel.showResult = false
+                        self.timerModel.isGameMode = false
+                        // Reset to default timer state or keep last time
+                        //self.timerModel.timeRemaining = 600  // default time
+                    }
+                    return nil
+                }
+                
                 return event
             }
         }
