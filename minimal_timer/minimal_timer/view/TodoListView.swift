@@ -232,6 +232,23 @@ struct TodoListView: View {
                 if let selectedTodo = todoState.selectedTodo {
                     activeView = .minimalTimer
                     inputText = selectedTodo.text
+                    DispatchQueue.main.async {
+                        if let window = NSApplication.shared.windows.first {
+                            // This will reposition the window based on the new view size
+                            if let screen = window.screen {
+                                let screenWidth = screen.visibleFrame.width
+                                let screenHeight = screen.visibleFrame.height
+                                let size = ViewDimensions.minimalTimer.size
+                                
+                                // Set position to default minimal timer position
+                                let newOriginX = screenWidth - size.width - 5
+                                let newOriginY = screenHeight - size.height - 37
+                                
+                                window.setContentSize(size)
+                                window.setFrameOrigin(NSPoint(x: newOriginX, y: newOriginY))
+                            }
+                        }
+                    }
                     return true
                 }
             } else {
