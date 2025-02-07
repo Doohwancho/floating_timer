@@ -32,8 +32,8 @@ struct ContentView: View {
                     inputText: $inputText
                 )
                     .frame(
-                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.width,
-                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size.height
+                        width: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count, todos: TodoListState.shared.todos).size.width,
+                        height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count, todos: TodoListState.shared.todos).size.height
                     )
             case .minimalTimer:
                 if timerModel.showResult {
@@ -204,7 +204,10 @@ struct ContentView: View {
        case .calendar:
            return ViewDimensions.calendar.size
        case .todoList:
-           return ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count).size
+           return ViewDimensions.todoList(
+               numberOfTodos: TodoListState.shared.todos.count,
+               todos: TodoListState.shared.todos
+           ).size
        }
    }
     

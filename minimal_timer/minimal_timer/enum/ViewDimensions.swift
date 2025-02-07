@@ -5,7 +5,7 @@ enum ViewDimensions {
     case minimalTimerWithResult
     case transparentTimer
     case calendar
-    case todoList(numberOfTodos: Int)
+    case todoList(numberOfTodos: Int, todos: [TodoItem]) // Modified to accept todos array
     
     var size: CGSize {
         switch self {
@@ -17,20 +17,46 @@ enum ViewDimensions {
             return CGSize(width: 270, height: 120)
         case .calendar:
             return CGSize(width: 295, height: 380)
-        case .todoList(let numberOfTodos):
-            let baseHeight: CGFloat = numberOfTodos == 0 ? 50 : 70 // Smaller height when empty
-            let todoItemHeight: CGFloat = 40
+        case .todoList(_, let todos):
+            let baseHeight: CGFloat = todos.isEmpty ? 50 : 70 // Base height when empty
             let inputHeight: CGFloat = 50 // Height for input field
-            let paddingHeight: CGFloat = 24 // Total vertical padding
+            let paddingHeight: CGFloat = 10 // Total vertical padding
+            let containerWidth: CGFloat = 160 // Total width minus horizontal padding
             
-            let calculatedHeight = if numberOfTodos == 0 {
-                baseHeight // Just show base height when empty
-            } else {
-                CGFloat(numberOfTodos) * todoItemHeight
+            // Calculate total height of all todos
+            let totalTodoHeight = todos.reduce(0) { (result, todo) in
+                result + calculateTodoHeight(text: todo.text, width: containerWidth)
             }
             
+            let calculatedHeight = todos.isEmpty ? baseHeight : totalTodoHeight + paddingHeight
             let maxHeight: CGFloat = 720
+            
             return CGSize(width: 200, height: min(calculatedHeight, maxHeight))
         }
+    }
+    // Helper function to calculate height for a single todo item
+    private func calculateTodoHeight(text: String, width: CGFloat) -> CGFloat {
+        let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        let baseHeight: CGFloat = 32 // Minimum height for a single line
+        let padding: CGFloat = 18 // Vertical padding within todo item
+        
+        // Create text container with the available width
+        let textStorage = NSTextStorage(string: text)
+        let textContainer = NSTextContainer(containerSize: NSSize(width: width, height: CGFloat.greatestFiniteMagnitude))
+        let layoutManager = NSLayoutManager()
+        
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        // Set the font and attributes
+        let range = NSRange(location: 0, length: textStorage.length)
+        textStorage.addAttribute(.font, value: font, range: range)
+        
+        // Calculate the height needed
+        let glyphRange = layoutManager.glyphRange(for: textContainer)
+        let bounds = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+        
+        // Return max of single line height or calculated height, plus padding
+        return (bounds.height / 13) * 31 + 5 //손수 맞춘 height. 좌변은 각 TODO당 height, 우항은 패딩.
     }
 }

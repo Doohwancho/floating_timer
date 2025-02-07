@@ -25,7 +25,8 @@ struct TodoListView: View {
 
         
     private var currentSize: CGSize {
-        ViewDimensions.todoList(numberOfTodos: todoState.todos.count).size
+//        ViewDimensions.todoList(numberOfTodos: todoState.todos.count).size
+        ViewDimensions.todoList(numberOfTodos: todoState.todos.count, todos: todoState.todos).size
     }
     
     var body: some View {
@@ -71,6 +72,7 @@ struct TodoListView: View {
                             ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
                                 Text(todo.text)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top, 4)
                                     .padding(8)
                                     .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
                                     .cornerRadius(8)
@@ -98,6 +100,7 @@ struct TodoListView: View {
         .background(Color.black)
         .foregroundColor(.white)
         .onChange(of: todoState.todos.count) { _ in
+            // Trigger resize when todos is added or subtracted
             shouldResizeWindow = true  // Trigger resize
         }
         .onChange(of: isInsertMode) { newValue in
@@ -124,7 +127,15 @@ struct TodoListView: View {
     
     private func handleTodoEdit() {
         if !todoText.isEmpty, let selectedIndex = todoState.selectedIndex {
+            let oldText = todoState.todos[selectedIndex].text
             todoState.todos[selectedIndex] = TodoItem(text: todoText)
+            
+            // Force a resize if the text content has changed
+            if oldText != todoText {
+                DispatchQueue.main.async {
+                    shouldResizeWindow = true //Text()에 너무 많은 글을 써서 height 늘어난 만큼 view size height가 즉각적으로 바뀌어야 한다.
+                }
+            }
             todoText = ""
         }
         isEditMode = false
