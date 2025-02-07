@@ -29,7 +29,7 @@ enum ViewDimensions {
                 CGFloat(numberOfTodos) * todoItemHeight
             }
             
-            let maxHeight: CGFloat = 600
+            let maxHeight: CGFloat = 720
             return CGSize(width: 200, height: min(calculatedHeight, maxHeight))
         }
     }

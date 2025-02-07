@@ -310,7 +310,7 @@ struct TodoListView: View {
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
-            print("Event monitor cleaned up - TodoListView")
+//            print("Event monitor cleaned up - TodoListView")
         }
     }
 }

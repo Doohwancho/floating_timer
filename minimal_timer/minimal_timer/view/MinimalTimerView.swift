@@ -208,7 +208,7 @@ struct MinimalTimerView: View {
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
-            print("Event monitor cleaned up - MinimalTimerView")
+//            print("Event monitor cleaned up - MinimalTimerView")
         }
     }
     
