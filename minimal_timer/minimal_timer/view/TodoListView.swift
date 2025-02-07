@@ -34,11 +34,12 @@ struct TodoListView: View {
                 TextField(isEditMode ? "Edit TODO" : "New TODO", text: $todoText)
                     .textFieldStyle(.plain)
                     .focused($isFocused)
-                    .padding(8)
+                    .padding(6)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                     .padding(.top, 12)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, 12)
+//                    .padding(.vertical, 6)
                     .padding(.horizontal)
                     .foregroundColor(.white) //text color
                     .onSubmit {
@@ -60,8 +61,9 @@ struct TodoListView: View {
                 // Show placeholder when no todos and not in insert mode
                 Text("Press 'i' to add todo")
                     .foregroundColor(.gray)
+                    .padding(.top, 4)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal)
             } else {
                 ScrollView(.vertical, showsIndicators: false) {
                     ScrollViewReader { proxy in
