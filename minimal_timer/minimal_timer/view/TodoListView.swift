@@ -35,6 +35,8 @@ struct TodoListView: View {
                 TextField(isEditMode ? "Edit TODO" : "New TODO", text: $todoText)
                     .textFieldStyle(.plain)
                     .focused($isFocused)
+//                    .lineLimit(5)
+//                    .frame(maxWidth: 150)
                     .padding(6)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
@@ -71,9 +73,11 @@ struct TodoListView: View {
                         VStack(spacing: 8) {
                             ForEach(Array(todoState.todos.enumerated()), id: \.element.id) { index, todo in
                                 Text(todo.text)
+                                    .lineLimit(2)  // 두 줄로 제한
+                                    .truncationMode(.tail)  // 그 이상은 말줄임표 처리
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.top, 4)
-                                    .padding(8)
+//                                        .padding(.top, 12)
+                                    .padding(12)
                                     .background(index == todoState.selectedIndex ? Color.blue.opacity(0.3) : Color.clear)
                                     .cornerRadius(8)
                                     .id(index) // Add id for scrolling
