@@ -14,15 +14,21 @@ struct MinimalTimerView: View {
     @FocusState private var isFocused: Bool
     @State private var isInsertMode = false
     
-    
+    // MARK: - 주석 처리된 기존 코드
+    /*
     private var currentDimensions: ViewDimensions {
         timerModel.showResult ? .minimalTimerWithResult : .minimalTimer
     }
+    */
 
     var body: some View {
+        // MARK: - 변경된 코드 (배경색 동적 변경)
+        let isOvertime = timerModel.timeRemaining < 0
+        
         ZStack{
             //1. 할일 적기 (pressing 'i' as insert mode)
-            if !timerModel.isGameMode {
+            // MARK: - 주석 처리된 기존 isGameMode 확인 로직
+            // if !timerModel.isGameMode {
                 if isInsertMode {
                     TextField("Enter text", text: $inputText)
                         .textFieldStyle(.plain)
@@ -40,14 +46,12 @@ struct MinimalTimerView: View {
                             handleInsertModeChange(newValue: false)
                         }
                         .onAppear {
-//                            handleInsertModeChange(newValue: true)
                             DispatchQueue.main.async {
                                 NSApp.activate(ignoringOtherApps: true)
                                 isFocused = true
                                 isInsertMode = true
                             }
                         }
-                        // Handle focus changes more gracefully
                         .onChange(of: isInsertMode) { oldValue, newValue in
                             isFocused = newValue
                         }
@@ -63,48 +67,43 @@ struct MinimalTimerView: View {
                         .truncationMode(.tail)
                         .zIndex(1)
                 }
-            }
+            // }
             
             //2. timer
+            // MARK: - 주석 처리된 기존 isGameMode 분기
+            /*
             if timerModel.isGameMode {
                 Text("?")
                     .font(.largeTitle)
                     .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                     .foregroundColor(.white)
             } else {
+            */
                 Text(timerModel.formatTime(timerModel.timeRemaining))
                     .font(.largeTitle)
                     .frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
                     .foregroundColor(.white)
                     .onTapGesture {
-                        if timerModel.isRunning {
-                            timerModel.stopTimer()
-                        } else {
-                            timerModel.startTimerDecrease()
-                        }
+                        // 탭 제스처로도 타이머 제어 가능
+                        timerModel.toggleTimer()
                     }
-                
-                //3. accumulated time (only show when not in result view)
-                if !timerModel.isGameMode {
-                    Text(accumulatedTimeModel.getTotalAccumulatedTime() + " / "
-                         + accumulatedTimeModel.getTodayAccumulatedTime())
-                    .font(.caption)
-                    .padding(.top, 35)
-                    .padding(.trailing, 10)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, alignment: .bottomTrailing)
-                }
-            }
+            
+                //3. accumulated time
+                Text(accumulatedTimeModel.getTotalAccumulatedTime() + " / "
+                     + accumulatedTimeModel.getTodayAccumulatedTime())
+                .font(.caption)
+                .padding(.top, 35)
+                .padding(.trailing, 10)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .bottomTrailing)
+            // }
         }
-        .background(Color.black)
+        // MARK: - 변경된 코드 (동적 배경 및 애니메이션)
+        .background(isOvertime ? Color(red: 0.5, green: 0, blue: 0) : Color.black)
+        .animation(.easeInOut(duration: 1.0), value: isOvertime)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .onChange(of: isInsertMode) { oldValue, newValue in
-            isFocused = newValue //TODO - handleInsertModeChange(newValue: newValue)로 바꿀까?
-//            print("------ onChange -------")
-//            print("oldValue: ", oldValue)
-//            print("newValue: ", newValue)
-//            print("isInsertMode: ", isInsertMode)
-//            print("isFocused: ", isFocused)
+            isFocused = newValue
         }
         .onChange(of: activeView) { oldValue, newValue in
             if newValue != .minimalTimer {
@@ -113,29 +112,19 @@ struct MinimalTimerView: View {
             }
         }
         .onAppear {
-            // Clean up any existing monitor first
             cleanupEventMonitor()
+            handleInsertModeChange(newValue: false)
             
-            // Reset states
-            handleInsertModeChange(newValue: false) 
+            eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                // MARK: - 변경된 코드 (showResult 조건 제거)
+                guard activeView == .minimalTimer else { return event }
             
-//            print("------ onAppear -------")
-//            print("isInsertMode: ", isInsertMode)
-//            print("isFocused: ", isFocused)
-            
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                // Only handle events when this view is active
-                guard activeView == .minimalTimer && !timerModel.showResult else { return event }
-            
-                
                 let isTypingMode = isInsertMode || isFocused
                 if !isTypingMode {
-//                    print("---- right now, its NOT insertMode! ----")
-//                    print("isInsertMode: ", isInsertMode)
-//                    print("isFocused: ", isFocused)
-                
                     //feat1: set time
-                    if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
+                    // MARK: - 주석 처리된 기존 isGameMode 확인
+                    // if !event.modifierFlags.contains(.command) && !self.timerModel.isGameMode {
+                    if !event.modifierFlags.contains(.command) {
                         if let characters = event.characters {
                             for character in characters {
                                 if character.isNumber {
@@ -149,22 +138,26 @@ struct MinimalTimerView: View {
                     
                     //feat2: decremental timer
                     if event.keyCode == 49 { // Spacebar
-                       if self.timerModel.isRunning {
-                            // Stop timer (either game mode or normal mode)
+                        // MARK: - 변경된 코드 (toggleTimer 호출)
+                        self.timerModel.toggleTimer()
+                        
+                        // MARK: - 주석 처리된 기존 게임모드 로직
+                        /*
+                        if self.timerModel.isRunning {
                             if self.timerModel.isGameMode {
                                 self.timerModel.stopGameMode()
                             } else {
                                 self.timerModel.pauseTimer()
                             }
                         } else {
-                            // Start game mode
                             self.timerModel.startGameMode()
                         }
+                        */
                         return nil
                     }
                     
                     //feat3: incremental timer
-                    if !timerModel.isGameMode && event.modifierFlags.contains(.command) {
+                    if event.modifierFlags.contains(.command) {
                         switch event.keyCode {
                         case 1: // Command + S
                             if self.timerModel.isRunning {
@@ -179,14 +172,12 @@ struct MinimalTimerView: View {
                     }
                     
                     //feat4: text 적기
-                    if !timerModel.isGameMode {
-                        if event.keyCode == 34  { // 34: 'i' key
-                            handleInsertModeChange(newValue: true)
-                            return nil
-                        } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
-                            handleInsertModeChange(newValue: false)
-                            return nil
-                        }
+                    if event.keyCode == 34  { // 34: 'i' key
+                        handleInsertModeChange(newValue: true)
+                        return nil
+                    } else if isInsertMode && (event.keyCode == 53 || event.keyCode == 36) { // 53: Esc key, 36: Enter key
+                        handleInsertModeChange(newValue: false)
+                        return nil
                     }
                 }
                 
@@ -195,7 +186,6 @@ struct MinimalTimerView: View {
         }
         .onDisappear {
             cleanupEventMonitor()
-            // 상태 초기화를 명시적으로 수행
             DispatchQueue.main.async {
                 isInsertMode = false
                 isFocused = false
@@ -208,29 +198,21 @@ struct MinimalTimerView: View {
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
-//            print("Event monitor cleaned up - MinimalTimerView")
         }
     }
     
     private func handleInsertModeChange(newValue: Bool) {
-        // Make state changes synchronously to avoid race conditions
         withAnimation {
             isInsertMode = newValue
             isFocused = newValue
         }
         
-        // Force focus if entering insert mode
         if newValue {
             DispatchQueue.main.async {
                 NSApp.activate(ignoringOtherApps: true)
                 isFocused = true
             }
         }
-        
-//        print("------ handleInsertModeChange -------")
-//        print("newValue: ", newValue)
-//        print("isInsertMode: ", isInsertMode)
-//        print("isFocused: ", isFocused)
     }
     
     private func finalizeInput() {
@@ -241,4 +223,4 @@ struct MinimalTimerView: View {
             self.accumulatedNumber = "" // Reset for next input
         }
     }
- }
+}

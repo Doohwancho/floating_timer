@@ -36,7 +36,8 @@ class TimerModel: ObservableObject {
     }
     var timer: Timer?
 
-
+    // MARK: - 주석 처리된 기존 게임 모드 코드
+    /*
     // Gamification properties
     @Published var isGameMode = false
     @Published var showResult = false
@@ -44,25 +45,39 @@ class TimerModel: ObservableObject {
     private var lastStreakResetDate: Date?
     @Published var initialTimeRemaining: Int = 0
     @Published var finalTimeRemaining: Int = 0
-        
-        
+    */
+
+    // MARK: - 변경/추가된 타이머 제어 코드
     
-    func startTimerDecrease() {
+    /// 타이머를 시작하거나 재개합니다.
+    func startTimer() {
+        // 이미 타이머가 실행 중이면 중복 실행 방지
+        guard !isRunning else { return }
+        
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            self.timeRemaining -= 1
-            self.accumulatedTimeModel.accumulatedTime += 1
-            if self.timeRemaining == 0 {
+            
+            // 시간이 0에 도달했을 때 알림음 한 번만 울림
+            if self.timeRemaining == 1 {
                 self.playAlarmSound()
             }
+            
+            self.timeRemaining -= 1
+            self.accumulatedTimeModel.accumulatedTime += 1 // 누적 시간은 계속 증가
         }
         isRunning = true
     }
     
-    func startTimerIncrease() {
-        // timer?.invalidate()
-        // timeRemaining = 0
+    /// 스페이스바를 통해 타이머를 시작/일시정지/재개하는 통합 함수
+    func toggleTimer() {
+        if isRunning {
+            pauseTimer()
+        } else {
+            startTimer()
+        }
+    }
 
+    func startTimerIncrease() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             if let self = self {
                 self.timeRemaining += 1
@@ -81,6 +96,8 @@ class TimerModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         isRunning = false
+        // 타이머를 완전히 멈추고 싶을 때 기본 시간으로 리셋 (선택적)
+        // timeRemaining = _timeIndexInMinutes * 60
     }
 
     func setTimer(with minutes: Int) {
@@ -114,6 +131,8 @@ class TimerModel: ObservableObject {
         )
     }
     
+    // MARK: - 주석 처리된 기존 게임 모드 코드
+    /*
     func formatTimeDifference(_ seconds: Double) -> String {
         let time = secondsToTimeComponents(seconds)
         
@@ -125,16 +144,19 @@ class TimerModel: ObservableObject {
             return String(format: "%.1fs off", time.totalSeconds)
         }
     }
+    */
     
-    // Regular timer display format
+    // MARK: - 변경된 시간 포맷 함수
+    /// 시간을 "분:초" 형식으로 변환합니다. 시간이 0 미만이면 "+분:초"로 표시됩니다.
     func formatTime(_ seconds: Int) -> String {
-        let isNegative = seconds < 0
+        let isOvertime = seconds < 0
         let absoluteSeconds = abs(seconds)
         let minutes = absoluteSeconds / 60
         let remainingSeconds = absoluteSeconds % 60
         
-        if isNegative {
-            return String(format: "-%02d:%02d", minutes, remainingSeconds)
+        if isOvertime {
+            // 초과 시간을 + 기호와 함께 표시
+            return String(format: "+%02d:%02d", minutes, remainingSeconds)
         } else {
             return String(format: "%02d:%02d", minutes, remainingSeconds)
         }
@@ -144,15 +166,16 @@ class TimerModel: ObservableObject {
         NSSound.beep()
     }
 
-
+    // MARK: - 주석 처리된 기존 게임 모드 코드
     /*****************************
     * gamification parts
     ***/
+    /*
     func startGameMode() {
         initialTimeRemaining = timeRemaining
         isGameMode = true
         showResult = false
-        startTimerDecrease()
+        startTimer() // startTimerDecrease()에서 이름 변경
         checkAndResetStreaks()
     }
     
@@ -172,7 +195,7 @@ class TimerModel: ObservableObject {
         if percentage >= 80 && percentage <= 120 {
             consecutiveStreaks += 1
         } else {
-            consecutiveStreaks = 0 //TODO - reset to zero is too harsh. change to accumulation and 
+            consecutiveStreaks = 0 //TODO - reset to zero is too harsh. change to accumulation and
         }
     }
     
@@ -208,5 +231,5 @@ class TimerModel: ObservableObject {
         
         lastStreakResetDate = now
     }
-    
+    */
 }

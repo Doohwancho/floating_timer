@@ -36,20 +36,23 @@ struct ContentView: View {
                         height: ViewDimensions.todoList(numberOfTodos: TodoListState.shared.todos.count, todos: TodoListState.shared.todos).size.height
                     )
             case .minimalTimer:
+                // MARK: - 주석 처리된 기존 ResultView 분기 로직
+                /*
                 if timerModel.showResult {
                     ResultView(
                         timerModel: timerModel,
                         activeView: $activeView
                     ).frame(width: ViewDimensions.minimalTimerWithResult.size.width,
-                               height: ViewDimensions.minimalTimerWithResult.size.height)
+                             height: ViewDimensions.minimalTimerWithResult.size.height)
                 } else {
+                */
                     MinimalTimerView(
                         timerModel: self.timerModel,
                         accumulatedTimeModel: self.accumulatedTimeModel,
                         activeView: $activeView,
                         inputText: $inputText
                     ).frame(width: ViewDimensions.minimalTimer.size.width, height: ViewDimensions.minimalTimer.size.height)
-                }
+                // }
             case .transparentTimer:
                 TransparentTimerView(
                     timerModel: self.timerModel,
@@ -64,6 +67,8 @@ struct ContentView: View {
                 ).frame(width: ViewDimensions.calendar.size.width, height: ViewDimensions.calendar.size.height)
             }
         }
+        // MARK: - 주석 처리된 기존 onChange(of: timerModel.showResult)
+        /*
         .onChange(of: timerModel.showResult) { _, _ in
             DispatchQueue.main.async {
                 if let window = NSApplication.shared.windows.first {
@@ -71,6 +76,7 @@ struct ContentView: View {
                 }
             }
         }
+        */
         .onChange(of: scenePhase) { _, newPhase in
             accumulatedTimeModel.scenePhase = newPhase
         }
@@ -109,7 +115,6 @@ struct ContentView: View {
                                 configureWindow(window)
                             }
                         }
-                        //                                return nil
                     case 19: // Command + 2
                         activeView = .transparentTimer
                         accumulatedTimeModel.checkForDateChange()
@@ -118,7 +123,6 @@ struct ContentView: View {
                                 configureWindow(window)
                             }
                         }
-                        //                                return nil
                     case 20: // Command + 3
                         activeView = .calendar
                         accumulatedTimeModel.checkForDateChange()
@@ -127,10 +131,8 @@ struct ContentView: View {
                                 configureWindow(window)
                             }
                         }
-                        //                                return nil
                     case 13: // Command + W
                         NSApplication.shared.terminate(self)
-                        //                                return nil
                     default:
                         break
                     }
@@ -145,7 +147,6 @@ struct ContentView: View {
     private func configureWindow(_ window: NSWindow?) {
         guard let window = window else { return }
         
-        //최소화, 최대화, 닫기 창을 style을 숨기는 코드
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.styleMask.insert(.borderless)
@@ -154,25 +155,13 @@ struct ContentView: View {
         window.styleMask.remove(.miniaturizable)
         window.styleMask.remove(.resizable)
         
-        /*
-            style 구조
-            
-            1. 하나의 window가 있고,
-            2. 이 window에 3개의 각개 다른 View들(MinimalTimerView, TransparentTimerView, CalendarWithDailyTimeView)가 붙는다.
-            3. 각 View의 style을 바꾸려면, 부모 window의 스타일을 transparent처리한 이 후, 각 View들 내부에서 개별적 style을 수정해준다. (window style을 투명하게 안하면 자식 view들의 style 수정시, 부모 window의 style이 같이 보여서 미관상 안좋다.)
-            4. 모든 View들에 공통적용되는 cornerRadius는 아래에 `window.contentView.layer.cornerRadius = 18`로 설정한다.
-         */
-        
-        //부모 window style을 투명하게 바꿔주는 코드
         window.isOpaque = false
         window.backgroundColor = .clear
         window.isMovableByWindowBackground = true
         window.level = .floating
         
-        //모든 자식 view들에게 공통적용되는 rounded corner
         window.contentView?.wantsLayer = true
         window.contentView?.layer?.cornerRadius = 18
-        //window.contentView?.layer?.masksToBounds = true //내부 view가 상위 window 모양에 종속되도록 하는 코드 resource: https://stackoverflow.com/questions/1509547/giving-uiview-rounded-corners
         
         positionWindow(window)
     }
@@ -185,7 +174,6 @@ struct ContentView: View {
             let screenWidth = screen.visibleFrame.width
             let screenHeight = screen.visibleFrame.height
             
-            // Calculate position to maintain the same top-right corner
             let newOriginX = screenWidth - size.width - 5
             let newOriginY = screenHeight - size.height - 37
             
@@ -194,22 +182,26 @@ struct ContentView: View {
     }
     
     private func getWindowSize() -> CGSize {
-       switch activeView {
-       case .minimalTimer:
-               return timerModel.showResult ?
-                   ViewDimensions.minimalTimerWithResult.size :
-                   ViewDimensions.minimalTimer.size
-       case .transparentTimer:
-           return ViewDimensions.transparentTimer.size
-       case .calendar:
-           return ViewDimensions.calendar.size
-       case .todoList:
-           return ViewDimensions.todoList(
-               numberOfTodos: TodoListState.shared.todos.count,
-               todos: TodoListState.shared.todos
-           ).size
-       }
-   }
+        switch activeView {
+        case .minimalTimer:
+            // MARK: - 변경된 코드 (showResult 조건 제거)
+            return ViewDimensions.minimalTimer.size
+            /*
+            return timerModel.showResult ?
+                ViewDimensions.minimalTimerWithResult.size :
+                ViewDimensions.minimalTimer.size
+            */
+        case .transparentTimer:
+            return ViewDimensions.transparentTimer.size
+        case .calendar:
+            return ViewDimensions.calendar.size
+        case .todoList:
+            return ViewDimensions.todoList(
+                numberOfTodos: TodoListState.shared.todos.count,
+                todos: TodoListState.shared.todos
+            ).size
+        }
+    }
     
     struct WindowAccessor: NSViewRepresentable {
         let callback: (NSWindow?) -> Void
