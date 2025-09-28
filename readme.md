@@ -29,6 +29,7 @@
 - h,l to switch months in calendar
 ```
 
+<!--
 # B. Design Decisions
 
 ## 1. parkinson's law
@@ -72,3 +73,4 @@ https://github.com/ESWAT/john-carmack-plan-archive/tree/master/by_day
 5. 모든 TODO가 clear되지 않으면 잠을 자지 않는다. (하루만 잠을 적게 자면 수면시간 확보하려고 TODO list를 현실적인 수준으로 조절하고, 시간안에 집중해서 끝내려고 함)
 6. 오해) 이건 일처리할 때 쓰는 툴이지 공부할 떄 쓰는 툴은 아니다. 공부는 자유롭게 탐구하는 식으로 해야한다.
 
+-->
